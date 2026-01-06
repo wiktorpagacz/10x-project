@@ -33,7 +33,7 @@ export type FlashcardSource = 'ai-full' | 'ai-edited' | 'manual';
  */
 export type FlashcardDto = Omit<
   Flashcard,
-  'user_id' | 'generation_id' | 'fts_vector'
+  'user_id' | 'fts_vector'
 >;
 
 /**
