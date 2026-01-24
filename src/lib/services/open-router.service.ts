@@ -83,7 +83,7 @@ Format your response as a JSON array like this:
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'openai/gpt-3.5-turbo',
+        model: 'liquid/lfm-2.5-1.2b-thinking:free',
         messages: [
           {
             role: 'system',
@@ -94,8 +94,8 @@ Format your response as a JSON array like this:
             content: userPrompt,
           },
         ],
-        temperature: 0.7,
-        max_tokens: 2000,
+        // temperature: 0.7,
+        // max_tokens: 2000,
       }),
     });
 

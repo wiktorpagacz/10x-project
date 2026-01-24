@@ -12,11 +12,8 @@ import type {
   CreateGenerationResponseDto,
   SuggestedFlashcardDto,
 } from '../../types.ts';
-import {
-  generateFlashcards,
-  OpenRouterError,
-  type GeneratedFlashcard,
-} from './open-router.service.ts';
+import { OpenRouterService, OpenRouterError } from './openrouter.service.ts';
+import type { GeneratedFlashcard } from './openrouter.types.ts';
 
 type SupabaseClientType = SupabaseClient<Database>;
 
@@ -42,6 +39,7 @@ export class GenerationError extends Error {
  * @param supabase - The Supabase client for database operations
  * @param userId - The ID of the user making the request
  * @param sourceText - The source text to generate flashcards from
+ * @param openRouterApiKey - The OpenRouter API key
  * @returns A DTO containing the generation ID and suggested flashcards
  * @throws GenerationError if anything fails
  */
@@ -49,23 +47,63 @@ export async function generateFlashcardsFromText(
   supabase: SupabaseClientType,
   userId: string,
   sourceText: string,
+  openRouterApiKey: string,
 ): Promise<CreateGenerationResponseDto> {
-  const MODEL = 'openai/gpt-3.5-turbo';
+  // Using Meta Llama 3.2 3B Instruct - Free tier, fast and reliable
+  // See: https://openrouter.ai/meta-llama/llama-3.2-3b-instruct:free
+  // Alternative: google/gemini-2.0-flash-exp:free (can be unstable)
+  const MODEL = 'google/gemini-2.0-flash-exp:free';
   const startTime = Date.now();
 
   try {
+    console.log('📊 Generation Service: Starting');
+    console.log('📝 Model:', MODEL);
+    console.log('👤 User ID:', userId);
+    
     // Step 1: Calculate metadata about source text
     const sourceTextLength = sourceText.length;
+    console.log('📏 Text length:', sourceTextLength);
+    
     const sourceTextHash = await sha256(sourceText);
+    console.log('🔐 Text hash:', sourceTextHash);
 
     // Step 2: Call AI service to generate flashcards
     let generatedFlashcards: GeneratedFlashcard[];
 
     try {
-      generatedFlashcards = await generateFlashcards(sourceText);
+      console.log('🤖 Creating OpenRouter service instance...');
+      
+      // Create OpenRouter service instance with the provided API key
+      const openRouterService = new OpenRouterService({
+        apiKey: openRouterApiKey,
+        defaultModel: MODEL,
+        appTitle: 'Flashcard Generator',
+      });
+      
+      console.log('✅ OpenRouter service created');
+      console.log('🎯 Calling generateFlashcards...');
+
+      // Generate flashcards using the service
+      generatedFlashcards = await openRouterService.generateFlashcards(sourceText, {
+        model: MODEL,
+        minFlashcards: 5,
+        maxFlashcards: 15,
+        temperature: 0.7,
+      });
+      
+      console.log('✅ Flashcards generated:', generatedFlashcards.length);
     } catch (error) {
+      console.error('❌ Error in AI service call:');
+      console.error('Error type:', error?.constructor?.name);
+      
       // If AI service fails, log the error and re-throw
       if (error instanceof OpenRouterError) {
+        console.error('❌ OpenRouterError:', {
+          statusCode: error.statusCode,
+          errorCode: error.errorCode,
+          message: error.message,
+          details: error.details,
+        });
         await logErrorToDb(supabase, {
           user_id: userId,
           model: MODEL,
