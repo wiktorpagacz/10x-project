@@ -1,8 +1,18 @@
 ---
-import Welcome from "../components/Welcome.astro";
-import Layout from "../layouts/Layout.astro";
+import Layout from "@/layouts/Layout.astro";
+import { GenerationView } from "@/components/generation";
+
+// Authentication check - user should be authenticated via middleware
+// context.locals.user will be populated by middleware if authenticated
+// const user = Astro.locals.user;
+
+// // If not authenticated, middleware should have redirected
+// // This is a safety check
+// if (!user) {
+//   return Astro.redirect('/login');
+// }
 ---
 
-<Layout>
-  <Welcome />
+<Layout title="Generate Flashcards - 10xCards">
+  <GenerationView client:only="react" />
 </Layout>
