@@ -34,6 +34,15 @@
   - GitHub Actions – Continuous integration and delivery
   - DigitalOcean – Hosts the application using Docker
 
+- **Testing:**
+  - Vitest – Unit and integration testing framework
+  - Playwright/Cypress – End-to-end (E2E) browser automation
+  - Apache JMeter/k6 – Performance and load testing
+  - Lighthouse – Frontend performance and accessibility audits
+  - OWASP ZAP – Security vulnerability scanning
+  - axe DevTools – Accessibility testing (WCAG 2.1 Level AA)
+  - NVDA/JAWS – Screen reader testing
+
 ## Getting Started Locally
 
 1. **Clone the Repository:**
@@ -75,6 +84,17 @@
 - **`npm run lint`** – Runs ESLint to analyze code quality.
 - **`npm run lint:fix`** – Automatically fixes fixable linting errors.
 - **`npm run format`** – Formats the codebase using Prettier.
+
+### Testing Scripts
+- **`npm test`** – Runs unit tests in watch mode.
+- **`npm run test:ui`** – Opens Vitest UI for interactive testing.
+- **`npm run test:coverage`** – Generates code coverage report.
+- **`npm run test:e2e`** – Runs end-to-end tests with Playwright.
+- **`npm run test:e2e:ui`** – Opens Playwright UI for interactive E2E testing.
+- **`npm run test:e2e:debug`** – Runs E2E tests in debug mode.
+- **`npm run test:e2e:codegen`** – Records browser interactions to generate tests.
+
+For complete testing documentation, see [TESTING.md](TESTING.md).
 
 ## Project Scope
 The MVP of 10xCards includes:
