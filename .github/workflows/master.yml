@@ -1,0 +1,47 @@
+name: Master Branch CI
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  quality-check:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Run linter
+        uses: ./.github/actions/run-linter
+
+      - name: Run unit tests
+        uses: ./.github/actions/run-unit-tests
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: quality-check
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js and install dependencies
+        uses: ./.github/actions/setup-node-deps
+
+      - name: Build application
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: build-${{ github.sha }}
+          path: dist/
+          retention-days: 7

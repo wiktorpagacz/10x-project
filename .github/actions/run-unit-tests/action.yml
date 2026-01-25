@@ -1,0 +1,22 @@
+name: 'Run Unit Tests'
+description: 'Runs unit tests with coverage collection'
+
+outputs:
+  coverage-path:
+    description: 'Path to coverage directory'
+    value: 'coverage/'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run unit tests with coverage
+      shell: bash
+      run: npm run test:coverage
+
+    - name: Upload unit test coverage
+      uses: actions/upload-artifact@v6
+      if: always()
+      with:
+        name: unit-coverage-${{ github.sha }}
+        path: coverage/
+        retention-days: 7

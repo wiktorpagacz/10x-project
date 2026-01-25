@@ -1,0 +1,9 @@
+name: 'Run Linter'
+description: 'Runs ESLint to check code quality'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run linter
+      shell: bash
+      run: npm run lint
