@@ -1,6 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from 'src/db/database.types';
-import type { PaginatedFlashcardsDto, FlashcardDto, FlashcardSource } from 'src/types';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "src/db/database.types";
+import type { PaginatedFlashcardsDto, FlashcardDto, FlashcardSource } from "src/types";
 
 /**
  * Retrieves a paginated list of flashcards for the authenticated user.
@@ -28,18 +28,15 @@ export async function getFlashcards(
     // Build the base query for the flashcards table
     // Exclude sensitive fields: user_id and fts_vector
     let query = supabase
-      .from('flashcards')
-      .select(
-        'id, front, back, source, generation_id, created_at, updated_at',
-        { count: 'exact' }
-      )
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
+      .from("flashcards")
+      .select("id, front, back, source, generation_id, created_at, updated_at", { count: "exact" })
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
 
     // Apply full-text search if search term is provided
     if (search && search.trim().length > 0) {
-      query = query.textSearch('fts_vector', search.trim(), {
-        type: 'websearch',
+      query = query.textSearch("fts_vector", search.trim(), {
+        type: "websearch",
       });
     }
 
@@ -50,13 +47,11 @@ export async function getFlashcards(
     const { data, count, error } = await query;
 
     if (error) {
-      throw new Error(
-        `Database query failed: ${error.message}`,
-      );
+      throw new Error(`Database query failed: ${error.message}`);
     }
 
     if (!data) {
-      throw new Error('Unexpected: data is null');
+      throw new Error("Unexpected: data is null");
     }
 
     // Calculate total pages
@@ -64,7 +59,7 @@ export async function getFlashcards(
     const totalPages = Math.ceil(totalItems / pageSize);
 
     // Transform data to FlashcardDto (exclude user_id and fts_vector)
-    const flashcardDtos: FlashcardDto[] = data.map(flashcard => ({
+    const flashcardDtos: FlashcardDto[] = data.map((flashcard) => ({
       id: flashcard.id,
       front: flashcard.front,
       back: flashcard.back,
@@ -85,7 +80,7 @@ export async function getFlashcards(
     };
   } catch (error) {
     // Log the error with context for debugging
-    console.error('Error in getFlashcards:', {
+    console.error("Error in getFlashcards:", {
       userId,
       page,
       pageSize,
@@ -111,24 +106,20 @@ export async function getFlashcards(
 export async function getFlashcardById(
   supabase: SupabaseClient<Database>,
   userId: string,
-  flashcardId: number,
+  flashcardId: number
 ): Promise<FlashcardDto | null> {
   try {
     // Query for the flashcard with the given ID and user_id
     // Exclude sensitive fields: user_id and fts_vector
     const { data, error } = await supabase
-      .from('flashcards')
-      .select(
-        'id, front, back, source, generation_id, created_at, updated_at'
-      )
-      .eq('user_id', userId)
-      .eq('id', flashcardId)
+      .from("flashcards")
+      .select("id, front, back, source, generation_id, created_at, updated_at")
+      .eq("user_id", userId)
+      .eq("id", flashcardId)
       .maybeSingle();
 
     if (error) {
-      throw new Error(
-        `Database query failed: ${error.message}`,
-      );
+      throw new Error(`Database query failed: ${error.message}`);
     }
 
     // If no flashcard found, return null
@@ -150,7 +141,7 @@ export async function getFlashcardById(
     return flashcardDto;
   } catch (error) {
     // Log the error with context for debugging
-    console.error('Error in getFlashcardById:', {
+    console.error("Error in getFlashcardById:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),
@@ -176,11 +167,11 @@ export async function createBatch(
   supabase: SupabaseClient<Database>,
   userId: string,
   generationId: number,
-  flashcards: Array<{ front: string; back: string; source: FlashcardSource }>
+  flashcards: { front: string; back: string; source: FlashcardSource }[]
 ): Promise<FlashcardDto[]> {
   try {
     // Construct the insert payload with user_id and generation_id
-    const insertPayload = flashcards.map(flashcard => ({
+    const insertPayload = flashcards.map((flashcard) => ({
       user_id: userId,
       front: flashcard.front,
       back: flashcard.back,
@@ -190,22 +181,20 @@ export async function createBatch(
 
     // Perform bulk insert and retrieve the created records in the same operation
     const { data, error } = await supabase
-      .from('flashcards')
+      .from("flashcards")
       .insert(insertPayload)
-      .select('id, front, back, source, generation_id, created_at, updated_at');
+      .select("id, front, back, source, generation_id, created_at, updated_at");
 
     if (error) {
-      throw new Error(
-        `Database insertion failed: ${error.message}`,
-      );
+      throw new Error(`Database insertion failed: ${error.message}`);
     }
 
     if (!data) {
-      throw new Error('Unexpected: inserted data is null');
+      throw new Error("Unexpected: inserted data is null");
     }
 
     // Transform data to FlashcardDto array
-    const flashcardDtos: FlashcardDto[] = data.map(flashcard => ({
+    const flashcardDtos: FlashcardDto[] = data.map((flashcard) => ({
       id: flashcard.id,
       front: flashcard.front,
       back: flashcard.back,
@@ -218,7 +207,7 @@ export async function createBatch(
     return flashcardDtos;
   } catch (error) {
     // Log the error with context for debugging
-    console.error('Error in createBatch:', {
+    console.error("Error in createBatch:", {
       userId,
       generationId,
       batchSize: flashcards.length,
@@ -256,16 +245,14 @@ export async function updateFlashcard(
   try {
     // Step 1: Fetch the existing flashcard to verify ownership
     const { data: existingFlashcard, error: fetchError } = await supabase
-      .from('flashcards')
-      .select('id, user_id')
-      .eq('id', flashcardId)
+      .from("flashcards")
+      .select("id, user_id")
+      .eq("id", flashcardId)
       .maybeSingle();
 
     // Handle fetch errors
     if (fetchError) {
-      throw new Error(
-        `Database query failed: ${fetchError.message}`,
-      );
+      throw new Error(`Database query failed: ${fetchError.message}`);
     }
 
     // If flashcard not found, return null (will be handled as 404 by the API)
@@ -275,7 +262,7 @@ export async function updateFlashcard(
 
     // Step 2: Verify ownership (throw custom error for 403 handling)
     if (existingFlashcard.user_id !== userId) {
-      throw new Error('OWNERSHIP_VIOLATION');
+      throw new Error("OWNERSHIP_VIOLATION");
     }
 
     // Step 3: Build update payload with only the provided fields
@@ -290,18 +277,16 @@ export async function updateFlashcard(
     // Step 4: Perform the update and retrieve the complete updated record
     // Select all public-facing fields: exclude user_id and fts_vector
     const { data: updatedFlashcard, error: updateError } = await supabase
-      .from('flashcards')
+      .from("flashcards")
       .update(updatePayload)
-      .eq('id', flashcardId)
-      .eq('user_id', userId)
-      .select('id, generation_id, front, back, source, created_at, updated_at')
+      .eq("id", flashcardId)
+      .eq("user_id", userId)
+      .select("id, generation_id, front, back, source, created_at, updated_at")
       .single();
 
     // Handle update errors
     if (updateError) {
-      throw new Error(
-        `Database update failed: ${updateError.message}`,
-      );
+      throw new Error(`Database update failed: ${updateError.message}`);
     }
 
     // Transform to FlashcardDto
@@ -318,7 +303,7 @@ export async function updateFlashcard(
     return flashcardDto;
   } catch (error) {
     // Log the error with context for debugging
-    console.error('Error in updateFlashcard:', {
+    console.error("Error in updateFlashcard:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),
@@ -342,21 +327,19 @@ export async function updateFlashcard(
 export async function deleteFlashcard(
   supabase: SupabaseClient<Database>,
   userId: string,
-  flashcardId: number,
+  flashcardId: number
 ): Promise<boolean> {
   try {
     // First, verify that the flashcard exists and belongs to the user
     const { data: existingFlashcard, error: fetchError } = await supabase
-      .from('flashcards')
-      .select('id')
-      .eq('id', flashcardId)
-      .eq('user_id', userId)
+      .from("flashcards")
+      .select("id")
+      .eq("id", flashcardId)
+      .eq("user_id", userId)
       .maybeSingle();
 
     if (fetchError) {
-      throw new Error(
-        `Database query failed: ${fetchError.message}`,
-      );
+      throw new Error(`Database query failed: ${fetchError.message}`);
     }
 
     // If flashcard not found or doesn't belong to user, return false
@@ -366,21 +349,19 @@ export async function deleteFlashcard(
 
     // Perform the deletion
     const { error: deleteError } = await supabase
-      .from('flashcards')
+      .from("flashcards")
       .delete()
-      .eq('id', flashcardId)
-      .eq('user_id', userId);
+      .eq("id", flashcardId)
+      .eq("user_id", userId);
 
     if (deleteError) {
-      throw new Error(
-        `Database deletion failed: ${deleteError.message}`,
-      );
+      throw new Error(`Database deletion failed: ${deleteError.message}`);
     }
 
     return true;
   } catch (error) {
     // Log the error with context for debugging
-    console.error('Error in deleteFlashcard:', {
+    console.error("Error in deleteFlashcard:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),

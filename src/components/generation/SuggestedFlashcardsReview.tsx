@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import { Save, Loader2, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { FlashcardPreviewCard } from './FlashcardPreviewCard';
-import type { SuggestedFlashcardsReviewProps } from './types';
-import { cn } from '@/lib/utils';
+import { useMemo } from "react";
+import { Save, Loader2, AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FlashcardPreviewCard } from "./FlashcardPreviewCard";
+import type { SuggestedFlashcardsReviewProps } from "./types";
+import { cn } from "@/lib/utils";
 
 /**
  * Composite component displaying and managing the curation workflow for AI-generated flashcard suggestions.
@@ -21,10 +21,10 @@ export function SuggestedFlashcardsReview({
 }: SuggestedFlashcardsReviewProps) {
   // Calculate summary statistics
   const { acceptedCount, rejectedCount, pendingCount, visibleCards } = useMemo(() => {
-    const accepted = cards.filter((c) => c.status === 'accepted').length;
-    const rejected = cards.filter((c) => c.status === 'rejected').length;
-    const pending = cards.filter((c) => c.status === 'pending').length;
-    const visible = cards.filter((c) => c.status !== 'rejected');
+    const accepted = cards.filter((c) => c.status === "accepted").length;
+    const rejected = cards.filter((c) => c.status === "rejected").length;
+    const pending = cards.filter((c) => c.status === "pending").length;
+    const visible = cards.filter((c) => c.status !== "rejected");
 
     return {
       acceptedCount: accepted,
@@ -43,9 +43,7 @@ export function SuggestedFlashcardsReview({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
-            Review and Accept Flashcards
-          </h2>
+          <h2 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">Review and Accept Flashcards</h2>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
             Review the AI-generated flashcards below. Accept, edit, or reject each card.
           </p>
@@ -106,9 +104,7 @@ export function SuggestedFlashcardsReview({
         >
           <AlertCircle className="h-5 w-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
-              No flashcards selected
-            </h3>
+            <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">No flashcards selected</h3>
             <p className="text-sm text-yellow-800 dark:text-yellow-200 mt-1">
               Accept at least one card to save to your collection.
             </p>
@@ -139,8 +135,8 @@ export function SuggestedFlashcardsReview({
           disabled={!canSave}
           size="lg"
           className={cn(
-            'flex-1 sm:flex-initial min-w-[240px]',
-            canSave && 'bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
+            "flex-1 sm:flex-initial min-w-[240px]",
+            canSave && "bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700"
           )}
         >
           {isSaving ? (
@@ -151,7 +147,7 @@ export function SuggestedFlashcardsReview({
           ) : (
             <>
               <Save className="mr-2 h-5 w-5" />
-              Save {acceptedCount > 0 ? `${acceptedCount} ` : ''}to Collection
+              Save {acceptedCount > 0 ? `${acceptedCount} ` : ""}to Collection
             </>
           )}
         </Button>

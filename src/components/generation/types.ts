@@ -1,5 +1,3 @@
-import type { SuggestedFlashcardDto } from '@/types';
-
 // ################################################################# //
 // ###################### VIEW STATE TYPES ######################### //
 // ################################################################# //
@@ -7,7 +5,7 @@ import type { SuggestedFlashcardDto } from '@/types';
 /**
  * Represents the state machine status for the Generation View.
  */
-export type GenerationViewStateType = 'idle' | 'generating' | 'reviewing' | 'saving' | 'error';
+export type GenerationViewStateType = "idle" | "generating" | "reviewing" | "saving" | "error";
 
 /**
  * Complete state of the Generation View, managing the state machine and all associated data.
@@ -15,23 +13,23 @@ export type GenerationViewStateType = 'idle' | 'generating' | 'reviewing' | 'sav
 export interface GenerationViewState {
   // State machine status
   status: GenerationViewStateType;
-  
+
   // User input and API response data
   sourceText: string; // Preserved across retries
   suggestedFlashcards: SuggestedFlashcardWithState[]; // Cards from API response
   generationId: number | null; // ID from POST /generations response
-  
+
   // Review/editing state
   selectedCardIndex: number | null; // Index of card being edited
   isEditing: boolean; // true when FlashcardModal is open
-  
+
   // Error handling
   error: ErrorInfo | null; // Current error state
   retryCount: number; // Counter for exponential backoff
-  
+
   // Toast management
   toasts: Toast[]; // Active toast notifications
-  
+
   // Modal states
   infoBoxExpanded: boolean;
   confirmDialogOpen: boolean;
@@ -44,11 +42,11 @@ export interface SuggestedFlashcardWithState {
   // Card content
   front: string;
   back: string;
-  source: 'ai-full' | 'ai-edited'; // Can change from ai-full to ai-edited when user edits
-  
+  source: "ai-full" | "ai-edited"; // Can change from ai-full to ai-edited when user edits
+
   // Client-side tracking
   id: string; // Unique client-side ID
-  status: 'pending' | 'accepted' | 'rejected'; // Review status
+  status: "pending" | "accepted" | "rejected"; // Review status
   isEdited: boolean; // True if user edited this card
 }
 
@@ -66,7 +64,7 @@ export interface ErrorInfo {
  */
 export interface Toast {
   id: string; // Unique ID for toast
-  type: 'error' | 'info' | 'success';
+  type: "error" | "info" | "success";
   message: string;
   retryable: boolean;
   autoClose: boolean;
@@ -85,7 +83,7 @@ export interface CharacterCounterModel {
   current: number; // Current character count
   max: number; // Maximum allowed characters
   percentage: number; // (current / max) * 100
-  status: 'valid' | 'warning' | 'error'; // Status based on percentage
+  status: "valid" | "warning" | "error"; // Status based on percentage
   isValid: boolean; // true if current meets all requirements
 }
 
@@ -212,7 +210,7 @@ export interface FlashcardModalProps {
 
 export interface ToastProps {
   id: string;
-  type: 'error' | 'info' | 'success';
+  type: "error" | "info" | "success";
   message: string;
   retryable: boolean;
   onDismiss: (id: string) => void;

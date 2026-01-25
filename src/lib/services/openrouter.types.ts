@@ -53,7 +53,7 @@ export interface ChatMessage {
   /**
    * Role of the message sender
    */
-  role: 'system' | 'user' | 'assistant';
+  role: "system" | "user" | "assistant";
 
   /**
    * Content of the message
@@ -79,7 +79,7 @@ export interface JsonSchema {
    * JSON Schema object defining the expected structure
    */
   schema: {
-    type: 'object' | 'array';
+    type: "object" | "array";
     properties?: Record<string, unknown>;
     items?: Record<string, unknown>;
     required?: string[];
@@ -95,7 +95,7 @@ export interface ResponseFormat {
   /**
    * Type of response format
    */
-  type: 'json_schema';
+  type: "json_schema";
 
   /**
    * JSON Schema definition
@@ -160,14 +160,14 @@ export interface OpenRouterApiResponse {
   id: string;
   model: string;
   created: number;
-  choices: Array<{
+  choices: {
     index: number;
     message: {
       role: string;
       content: string;
     };
     finish_reason: string;
-  }>;
+  }[];
   usage?: {
     prompt_tokens: number;
     completion_tokens: number;
@@ -219,16 +219,16 @@ export interface GeneratedFlashcard {
  * Error codes for OpenRouter operations
  */
 export type OpenRouterErrorCode =
-  | 'MISSING_API_KEY'
-  | 'INVALID_REQUEST'
-  | 'AUTHENTICATION_ERROR'
-  | 'INSUFFICIENT_CREDITS'
-  | 'NOT_FOUND'
-  | 'RATE_LIMIT_EXCEEDED'
-  | 'SERVER_ERROR'
-  | 'SERVICE_UNAVAILABLE'
-  | 'TIMEOUT_ERROR'
-  | 'NETWORK_ERROR'
-  | 'PARSE_ERROR'
-  | 'VALIDATION_ERROR'
-  | 'API_ERROR';
+  | "MISSING_API_KEY"
+  | "INVALID_REQUEST"
+  | "AUTHENTICATION_ERROR"
+  | "INSUFFICIENT_CREDITS"
+  | "NOT_FOUND"
+  | "RATE_LIMIT_EXCEEDED"
+  | "SERVER_ERROR"
+  | "SERVICE_UNAVAILABLE"
+  | "TIMEOUT_ERROR"
+  | "NETWORK_ERROR"
+  | "PARSE_ERROR"
+  | "VALIDATION_ERROR"
+  | "API_ERROR";

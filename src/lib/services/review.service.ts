@@ -1,6 +1,6 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from 'src/db/database.types';
-import type { ReviewFlashcardDto } from 'src/types';
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "src/db/database.types";
+import type { ReviewFlashcardDto } from "src/types";
 
 /**
  * Retrieves flashcards due for review today for a given user.
@@ -22,55 +22,51 @@ export async function getFlashcardsDueForReview(
   reviewDate: Date = new Date()
 ): Promise<ReviewFlashcardDto[]> {
   // Format the review date as YYYY-MM-DD for comparison in the database
-  const reviewDateString = reviewDate.toISOString().split('T')[0];
+  const reviewDateString = reviewDate.toISOString().split("T")[0];
 
-  try {
-    // Query the spaced_repetition_state table to find flashcards due for review
-    // Join with flashcards table to get only the necessary fields (id, front, back)
-    // Note: Using any type casting because the table may not be in the auto-generated types yet
-    const { data, error } = await (supabase as any)
-      .from('spaced_repetition_state')
-      .select(
-        `
+  interface SpacedRepetitionQueryResult {
+    flashcard_id: number;
+    flashcards: { id: number; front: string; back: string }[];
+  }
+
+  // Query the spaced_repetition_state table to find flashcards due for review
+  // Join with flashcards table to get only the necessary fields (id, front, back)
+  // Note: Using type assertion because the table may not be in the auto-generated types yet
+  const { data, error } = (await (supabase as unknown as SupabaseClient)
+    .from("spaced_repetition_state")
+    .select(
+      `
         flashcard_id,
         flashcards!inner(id, front, back)
       `
-      )
-      .eq('user_id', userId)
-      .lte('next_review_date', reviewDateString);
+    )
+    .eq("user_id", userId)
+    .lte("next_review_date", reviewDateString)) as { data: SpacedRepetitionQueryResult[] | null; error: Error | null };
 
-    // Handle database errors
-    if (error) {
-      throw new Error(
-        `Failed to retrieve flashcards due for review: ${error.message}`
-      );
-    }
-
-    // Transform the query result into ReviewFlashcardDto array
-    // The response structure is { flashcard_id, flashcards: { id, front, back } }
-    // We extract the flashcard object and ensure proper typing
-    const flashcards = (data || []).map(
-      (item: { flashcards: { id: number; front: string; back: string } }) => {
-        const flashcard = item.flashcards || {
-          id: 0,
-          front: '',
-          back: '',
-        };
-
-        return {
-          id: flashcard.id,
-          front: flashcard.front,
-          back: flashcard.back,
-        } as ReviewFlashcardDto;
-      }
-    );
-
-    // Shuffle the flashcards for randomized presentation
-    return shuffleArray(flashcards);
-  } catch (error) {
-    // Re-throw the error to be handled by the API endpoint
-    throw error;
+  // Handle database errors
+  if (error) {
+    throw new Error(`Failed to retrieve flashcards due for review: ${error.message}`);
   }
+
+  // Transform the query result into ReviewFlashcardDto array
+  // The response structure is { flashcard_id, flashcards: [{ id, front, back }] }
+  // We extract the flashcard object and ensure proper typing
+  const flashcards = (data || []).map((item) => {
+    const flashcard = item.flashcards?.[0] || {
+      id: 0,
+      front: "",
+      back: "",
+    };
+
+    return {
+      id: flashcard.id,
+      front: flashcard.front,
+      back: flashcard.back,
+    } as ReviewFlashcardDto;
+  });
+
+  // Shuffle the flashcards for randomized presentation
+  return shuffleArray(flashcards);
 }
 
 /**

@@ -1,18 +1,13 @@
-import { useState, useCallback } from 'react';
-import type {
-  GenerationViewState,
-  GenerationViewStateType,
-  SuggestedFlashcardWithState,
-  ErrorInfo,
-} from '../types';
-import type { CreateGenerationResponseDto } from '@/types';
+import { useState, useCallback } from "react";
+import type { GenerationViewState, SuggestedFlashcardWithState, ErrorInfo } from "../types";
+import type { CreateGenerationResponseDto } from "@/types";
 
-const STORAGE_KEY_SOURCE_TEXT = 'generation-view-source-text';
+const STORAGE_KEY_SOURCE_TEXT = "generation-view-source-text";
 
 /**
  * Main state management hook for the Generation View.
  * Manages the complete state machine and all state transitions.
- * 
+ *
  * State Machine Flow:
  * idle → generating → reviewing → saving → idle
  *   ↑       ↓           ↓           ↓
@@ -20,7 +15,7 @@ const STORAGE_KEY_SOURCE_TEXT = 'generation-view-source-text';
  */
 export function useGenerationViewState() {
   const [state, setState] = useState<GenerationViewState>({
-    status: 'idle',
+    status: "idle",
     sourceText: loadSourceTextFromStorage(),
     suggestedFlashcards: [],
     generationId: null,
@@ -38,11 +33,11 @@ export function useGenerationViewState() {
   const setSourceText = useCallback((text: string) => {
     setState((prev) => ({ ...prev, sourceText: text }));
     // Persist to localStorage for recovery
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
       try {
         localStorage.setItem(STORAGE_KEY_SOURCE_TEXT, text);
       } catch (e) {
-        console.warn('Failed to persist source text to localStorage', e);
+        console.warn("Failed to persist source text to localStorage", e);
       }
     }
   }, []);
@@ -52,25 +47,23 @@ export function useGenerationViewState() {
   const startGeneration = useCallback(() => {
     setState((prev) => ({
       ...prev,
-      status: 'generating',
+      status: "generating",
       error: null,
     }));
   }, []);
 
   const completeGeneration = useCallback((response: CreateGenerationResponseDto) => {
     // Transform API response to client-side state
-    const flashcardsWithState: SuggestedFlashcardWithState[] = response.suggested_flashcards.map(
-      (card, index) => ({
-        ...card,
-        id: `card-${response.generation_id}-${index}`,
-        status: 'pending' as const,
-        isEdited: false,
-      })
-    );
+    const flashcardsWithState: SuggestedFlashcardWithState[] = response.suggested_flashcards.map((card, index) => ({
+      ...card,
+      id: `card-${response.generation_id}-${index}`,
+      status: "pending" as const,
+      isEdited: false,
+    }));
 
     setState((prev) => ({
       ...prev,
-      status: 'reviewing',
+      status: "reviewing",
       suggestedFlashcards: flashcardsWithState,
       generationId: response.generation_id,
       retryCount: 0, // Reset retry count on success
@@ -81,7 +74,7 @@ export function useGenerationViewState() {
   const setGenerationError = useCallback((error: ErrorInfo) => {
     setState((prev) => ({
       ...prev,
-      status: 'error',
+      status: "error",
       error,
     }));
   }, []);
@@ -99,7 +92,7 @@ export function useGenerationViewState() {
     setState((prev) => {
       const updated = [...prev.suggestedFlashcards];
       if (updated[index]) {
-        updated[index] = { ...updated[index], status: 'accepted' };
+        updated[index] = { ...updated[index], status: "accepted" };
       }
       return { ...prev, suggestedFlashcards: updated };
     });
@@ -109,7 +102,7 @@ export function useGenerationViewState() {
     setState((prev) => {
       const updated = [...prev.suggestedFlashcards];
       if (updated[index]) {
-        updated[index] = { ...updated[index], status: 'rejected' };
+        updated[index] = { ...updated[index], status: "rejected" };
       }
       return { ...prev, suggestedFlashcards: updated };
     });
@@ -117,9 +110,9 @@ export function useGenerationViewState() {
 
   const acceptAllCards = useCallback(() => {
     setState((prev) => {
-      const updated = prev.suggestedFlashcards.map(card => ({
+      const updated = prev.suggestedFlashcards.map((card) => ({
         ...card,
-        status: 'accepted' as const,
+        status: "accepted" as const,
       }));
       return { ...prev, suggestedFlashcards: updated };
     });
@@ -127,9 +120,9 @@ export function useGenerationViewState() {
 
   const rejectAllCards = useCallback(() => {
     setState((prev) => {
-      const updated = prev.suggestedFlashcards.map(card => ({
+      const updated = prev.suggestedFlashcards.map((card) => ({
         ...card,
-        status: 'rejected' as const,
+        status: "rejected" as const,
       }));
       return { ...prev, suggestedFlashcards: updated };
     });
@@ -150,15 +143,15 @@ export function useGenerationViewState() {
 
       const updated = [...prev.suggestedFlashcards];
       const card = updated[cardIndex];
-      
+
       if (card) {
         updated[cardIndex] = {
           ...card,
           front,
           back,
-          status: 'accepted', // Auto-accept edited cards
+          status: "accepted", // Auto-accept edited cards
           isEdited: true,
-          source: 'ai-edited' as const,
+          source: "ai-edited" as const,
         };
       }
 
@@ -184,25 +177,25 @@ export function useGenerationViewState() {
   const startSave = useCallback(() => {
     setState((prev) => ({
       ...prev,
-      status: 'saving',
+      status: "saving",
       error: null,
     }));
   }, []);
 
   const completeSave = useCallback(() => {
     // Clear localStorage on successful save
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
       try {
         localStorage.removeItem(STORAGE_KEY_SOURCE_TEXT);
       } catch (e) {
-        console.warn('Failed to clear localStorage', e);
+        console.warn("Failed to clear localStorage", e);
       }
     }
 
     // Reset to idle state
     setState({
-      status: 'idle',
-      sourceText: '',
+      status: "idle",
+      sourceText: "",
       suggestedFlashcards: [],
       generationId: null,
       selectedCardIndex: null,
@@ -218,7 +211,7 @@ export function useGenerationViewState() {
   const setSaveError = useCallback((error: ErrorInfo) => {
     setState((prev) => ({
       ...prev,
-      status: 'error',
+      status: "error",
       error,
     }));
   }, []);
@@ -256,17 +249,17 @@ export function useGenerationViewState() {
   // ========== STATE RESET ========== //
 
   const resetState = useCallback(() => {
-    if (typeof window !== 'undefined' && typeof localStorage !== 'undefined') {
+    if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
       try {
         localStorage.removeItem(STORAGE_KEY_SOURCE_TEXT);
       } catch (e) {
-        console.warn('Failed to clear localStorage', e);
+        console.warn("Failed to clear localStorage", e);
       }
     }
 
     setState({
-      status: 'idle',
-      sourceText: '',
+      status: "idle",
+      sourceText: "",
       suggestedFlashcards: [],
       generationId: null,
       selectedCardIndex: null,
@@ -282,7 +275,7 @@ export function useGenerationViewState() {
   // ========== HELPER GETTERS ========== //
 
   const getAcceptedCards = useCallback(() => {
-    return state.suggestedFlashcards.filter((card) => card.status === 'accepted');
+    return state.suggestedFlashcards.filter((card) => card.status === "accepted");
   }, [state.suggestedFlashcards]);
 
   const getSelectedCard = useCallback(() => {
@@ -347,15 +340,15 @@ export function useGenerationViewState() {
  */
 function loadSourceTextFromStorage(): string {
   // Check if we're running in the browser (client-side)
-  if (typeof window === 'undefined' || typeof localStorage === 'undefined') {
-    return '';
+  if (typeof window === "undefined" || typeof localStorage === "undefined") {
+    return "";
   }
-  
+
   try {
-    return localStorage.getItem(STORAGE_KEY_SOURCE_TEXT) || '';
+    return localStorage.getItem(STORAGE_KEY_SOURCE_TEXT) || "";
   } catch (e) {
-    console.warn('Failed to load source text from localStorage', e);
-    return '';
+    console.warn("Failed to load source text from localStorage", e);
+    return "";
   }
 }
 

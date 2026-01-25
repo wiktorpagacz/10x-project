@@ -1,6 +1,6 @@
-import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import "@testing-library/jest-dom/vitest";
+import { cleanup } from "@testing-library/react";
+import { afterEach, vi } from "vitest";
 
 // Clean up after each test
 afterEach(() => {
@@ -17,7 +17,14 @@ const localStorageMock = (() => {
       store[key] = value.toString();
     },
     removeItem: (key: string) => {
-      delete store[key];
+      const keyToRemove = key;
+      const newStore: Record<string, string> = {};
+      for (const k in store) {
+        if (k !== keyToRemove) {
+          newStore[k] = store[k];
+        }
+      }
+      store = newStore;
     },
     clear: () => {
       store = {};
@@ -25,12 +32,12 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(global, 'localStorage', {
+Object.defineProperty(global, "localStorage", {
   value: localStorageMock,
 });
 
 // Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: vi.fn().mockImplementation((query) => ({
     matches: false,

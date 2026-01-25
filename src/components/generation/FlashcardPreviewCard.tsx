@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { Check, Edit2, X, Save, XCircle as Cancel } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import type { FlashcardPreviewCardProps } from './types';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Check, Edit2, X, Save, XCircle as Cancel } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import type { FlashcardPreviewCardProps } from "./types";
+import { cn } from "@/lib/utils";
 
 const MAX_PREVIEW_LENGTH = 100;
 const FRONT_MAX_CHARS = 200;
@@ -14,25 +14,19 @@ const BACK_MAX_CHARS = 500;
  * Displays truncated front and back text with action buttons.
  * Supports inline editing mode.
  */
-export function FlashcardPreviewCard({
-  card,
-  cardIndex,
-  onAccept,
-  onEdit,
-  onReject,
-}: FlashcardPreviewCardProps) {
+export function FlashcardPreviewCard({ card, cardIndex, onAccept, onEdit, onReject }: FlashcardPreviewCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editFront, setEditFront] = useState(card.front);
   const [editBack, setEditBack] = useState(card.back);
 
   const truncate = (text: string, maxLength: number) => {
     if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength).trim() + '...';
+    return text.substring(0, maxLength).trim() + "...";
   };
 
-  const isAccepted = card.status === 'accepted';
-  const isPending = card.status === 'pending';
-  const isRejected = card.status === 'rejected';
+  const isAccepted = card.status === "accepted";
+  const isPending = card.status === "pending";
+  const isRejected = card.status === "rejected";
 
   // Don't render rejected cards
   if (isRejected) return null;
@@ -72,11 +66,11 @@ export function FlashcardPreviewCard({
   return (
     <div
       className={cn(
-        'group relative rounded-lg border p-4 transition-all',
+        "group relative rounded-lg border p-4 transition-all",
         isAccepted
-          ? 'border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/20'
-          : 'border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900',
-        'hover:shadow-md'
+          ? "border-green-300 bg-green-50 dark:border-green-700 dark:bg-green-950/20"
+          : "border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900",
+        "hover:shadow-md"
       )}
     >
       {/* Status Badge */}
@@ -173,12 +167,7 @@ export function FlashcardPreviewCard({
             <Save className="mr-1.5 h-4 w-4" />
             Save
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleCancel}
-            className="flex-1"
-          >
+          <Button variant="outline" size="sm" onClick={handleCancel} className="flex-1">
             <Cancel className="mr-1.5 h-4 w-4" />
             Cancel
           </Button>
@@ -195,12 +184,7 @@ export function FlashcardPreviewCard({
             <Check className="mr-1.5 h-4 w-4" />
             Accept
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleEdit}
-            className="flex-1"
-          >
+          <Button variant="outline" size="sm" onClick={handleEdit} className="flex-1">
             <Edit2 className="mr-1.5 h-4 w-4" />
             Edit
           </Button>
@@ -217,12 +201,7 @@ export function FlashcardPreviewCard({
       ) : (
         // Accepted state buttons
         <div className="mt-4 flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleEdit}
-            className="flex-1"
-          >
+          <Button variant="outline" size="sm" onClick={handleEdit} className="flex-1">
             <Edit2 className="mr-1.5 h-4 w-4" />
             Edit
           </Button>

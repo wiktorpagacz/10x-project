@@ -1,14 +1,10 @@
-import { useEffect } from 'react';
-import { ChevronDown, Info } from 'lucide-react';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import type { InfoBoxProps } from './types';
-import { cn } from '@/lib/utils';
+import { useEffect } from "react";
+import { ChevronDown, Info } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import type { InfoBoxProps } from "./types";
+import { cn } from "@/lib/utils";
 
-const STORAGE_KEY = 'generation-view-infobox-expanded';
+const STORAGE_KEY = "generation-view-infobox-expanded";
 
 /**
  * Collapsible informational component displaying instructions and character limit details.
@@ -29,14 +25,12 @@ export function InfoBox({ isExpanded, onToggle }: InfoBoxProps) {
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors">
         <div className="flex items-center gap-2">
           <Info className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100">
-            How to Generate Flashcards
-          </h3>
+          <h3 className="font-semibold text-blue-900 dark:text-blue-100">How to Generate Flashcards</h3>
         </div>
         <ChevronDown
           className={cn(
-            'h-5 w-5 text-blue-600 dark:text-blue-400 transition-transform duration-200',
-            isExpanded && 'rotate-180'
+            "h-5 w-5 text-blue-600 dark:text-blue-400 transition-transform duration-200",
+            isExpanded && "rotate-180"
           )}
         />
       </CollapsibleTrigger>
@@ -44,8 +38,8 @@ export function InfoBox({ isExpanded, onToggle }: InfoBoxProps) {
       <CollapsibleContent className="px-4 pb-4 pt-2">
         <div className="space-y-3 text-sm text-blue-900 dark:text-blue-100">
           <p>
-            Paste or type your study material in the text area below. Our AI will
-            analyze your content and generate flashcards automatically.
+            Paste or type your study material in the text area below. Our AI will analyze your content and generate
+            flashcards automatically.
           </p>
 
           <div className="space-y-2">

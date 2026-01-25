@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 
 interface ToastOptions {
   autoClose?: boolean;
@@ -9,7 +9,7 @@ interface ToastOptions {
 
 export interface ToastNotification {
   id: string;
-  type: 'error' | 'info' | 'success';
+  type: "error" | "info" | "success";
   message: string;
   retryable: boolean;
   autoClose: boolean;
@@ -19,18 +19,14 @@ export interface ToastNotification {
 
 /**
  * Hook managing toast queue and auto-dismiss.
- * 
+ *
  * @returns Toast state and helper functions
  */
 export function useToastNotifications() {
   const [toasts, setToasts] = useState<ToastNotification[]>([]);
 
   const showToast = useCallback(
-    (
-      message: string,
-      type: 'error' | 'info' | 'success' = 'info',
-      options: ToastOptions = {}
-    ) => {
+    (message: string, type: "error" | "info" | "success" = "info", options: ToastOptions = {}) => {
       const id = `toast-${Date.now()}-${Math.random()}`;
       const toast: ToastNotification = {
         id,
@@ -60,7 +56,7 @@ export function useToastNotifications() {
 
   const showErrorWithRetry = useCallback(
     (message: string, onRetry: () => void) => {
-      showToast(message, 'error', {
+      showToast(message, "error", {
         retryable: true,
         autoClose: false,
         onRetry,

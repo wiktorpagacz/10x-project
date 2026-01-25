@@ -20,13 +20,9 @@
  *   - 500: Server error
  */
 
-import type { APIContext } from 'astro';
-import { z } from 'zod';
-import type {
-  LoginRequestDto,
-  AuthSuccessResponseDto,
-  ErrorResponse,
-} from '../../../types.ts';
+import type { APIContext } from "astro";
+import { z } from "zod";
+import type { LoginRequestDto, AuthSuccessResponseDto, ErrorResponse } from "../../../types.ts";
 
 // Prevent pre-rendering for this API route
 export const prerender = false;
@@ -36,11 +32,8 @@ export const prerender = false;
  * Ensures email format and required fields.
  */
 const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, 'Email jest wymagany')
-    .email('Wprowadź poprawny adres email'),
-  password: z.string().min(1, 'Hasło jest wymagane'),
+  email: z.string().min(1, "Email jest wymagany").email("Wprowadź poprawny adres email"),
+  password: z.string().min(1, "Hasło jest wymagane"),
 });
 
 /**
@@ -57,34 +50,34 @@ export async function POST(context: APIContext): Promise<Response> {
 
     try {
       requestBody = await context.request.json();
-      
+
       // Ensure body is an object (not a primitive or array)
-      if (typeof requestBody !== 'object' || requestBody === null || Array.isArray(requestBody)) {
+      if (typeof requestBody !== "object" || requestBody === null || Array.isArray(requestBody)) {
         return new Response(
           JSON.stringify({
             error: {
-              code: 'INVALID_JSON',
-              message: 'Request body must be a valid JSON object',
+              code: "INVALID_JSON",
+              message: "Request body must be a valid JSON object",
             },
           } as ErrorResponse),
           {
             status: 400,
-            headers: { 'Content-Type': 'application/json' },
-          },
+            headers: { "Content-Type": "application/json" },
+          }
         );
       }
     } catch {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'INVALID_JSON',
-            message: 'Request body must be valid JSON',
+            code: "INVALID_JSON",
+            message: "Request body must be valid JSON",
           },
         } as ErrorResponse),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -97,15 +90,15 @@ export async function POST(context: APIContext): Promise<Response> {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'VALIDATION_ERROR',
+            code: "VALIDATION_ERROR",
             message: firstError.message,
             field: firstError.path[0] as string,
           },
         } as ErrorResponse),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -122,24 +115,24 @@ export async function POST(context: APIContext): Promise<Response> {
     // Step 4: Handle authentication errors
     if (error) {
       // Map Supabase errors to user-friendly messages
-      let errorMessage = 'Nieprawidłowy login lub hasło';
-      let errorCode = 'INVALID_CREDENTIALS';
+      let errorMessage = "Nieprawidłowy login lub hasło";
+      let errorCode = "INVALID_CREDENTIALS";
 
       // Specific error handling for better UX
-      if (error.message.includes('Invalid login credentials')) {
-        errorMessage = 'Nieprawidłowy login lub hasło';
-      } else if (error.message.includes('Email not confirmed')) {
-        errorMessage = 'Email nie został potwierdzony';
-        errorCode = 'EMAIL_NOT_CONFIRMED';
-      } else if (error.message.includes('User not found')) {
-        errorMessage = 'Nieprawidłowy login lub hasło'; // Don't reveal user existence
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Nieprawidłowy login lub hasło";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Email nie został potwierdzony";
+        errorCode = "EMAIL_NOT_CONFIRMED";
+      } else if (error.message.includes("User not found")) {
+        errorMessage = "Nieprawidłowy login lub hasło"; // Don't reveal user existence
       } else {
         // Generic error for unexpected cases
-        errorMessage = 'Wystąpił błąd podczas logowania. Spróbuj ponownie';
-        errorCode = 'AUTH_ERROR';
+        errorMessage = "Wystąpił błąd podczas logowania. Spróbuj ponownie";
+        errorCode = "AUTH_ERROR";
       }
 
-      console.error('Login error:', error);
+      console.error("Login error:", error);
 
       return new Response(
         JSON.stringify({
@@ -150,26 +143,26 @@ export async function POST(context: APIContext): Promise<Response> {
         } as ErrorResponse),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
     // Step 5: Validate response data
     if (!data.user || !data.session) {
-      console.error('Login succeeded but no user/session returned');
+      console.error("Login succeeded but no user/session returned");
 
       return new Response(
         JSON.stringify({
           error: {
-            code: 'AUTH_ERROR',
-            message: 'Wystąpił błąd podczas logowania. Spróbuj ponownie',
+            code: "AUTH_ERROR",
+            message: "Wystąpił błąd podczas logowania. Spróbuj ponownie",
           },
         } as ErrorResponse),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -180,29 +173,29 @@ export async function POST(context: APIContext): Promise<Response> {
         success: true,
         user: {
           id: data.user.id,
-          email: data.user.email!,
+          email: data.user.email ?? "",
         },
       } as AuthSuccessResponseDto),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { "Content-Type": "application/json" },
+      }
     );
   } catch (error) {
     // Unexpected server error
-    console.error('Unexpected error in login endpoint:', error);
+    console.error("Unexpected error in login endpoint:", error);
 
     return new Response(
       JSON.stringify({
         error: {
-          code: 'INTERNAL_ERROR',
-          message: 'Wystąpił błąd serwera. Spróbuj ponownie później',
+          code: "INTERNAL_ERROR",
+          message: "Wystąpił błąd serwera. Spróbuj ponownie później",
         },
       } as ErrorResponse),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

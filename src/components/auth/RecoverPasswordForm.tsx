@@ -12,8 +12,7 @@ import { Button } from "@/components/ui/button";
  * Password recovery for forgotten passwords is not part of the MVP.
  */
 export function RecoverPasswordForm() {
-  const { formState, setEmail, validateForm, setGeneralError, setSuccessMessage, setIsLoading, resetErrors } =
-    useRecoverPasswordForm();
+  const { formState, setEmail, validateForm, setGeneralError, setIsLoading, resetErrors } = useRecoverPasswordForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

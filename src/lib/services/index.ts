@@ -1,6 +1,6 @@
 // OpenRouter Service exports
-export { OpenRouterService } from './openrouter.service';
-export { OpenRouterError } from './openrouter.error';
+export { OpenRouterService } from "./openrouter.service";
+export { OpenRouterError } from "./openrouter.error";
 export type {
   OpenRouterServiceConfig,
   ChatCompletionRequest,
@@ -10,9 +10,9 @@ export type {
   FlashcardGenerationOptions,
   GeneratedFlashcard,
   OpenRouterErrorCode,
-} from './openrouter.types';
+} from "./openrouter.types";
 
 // Other service exports
-export * from './flashcard.service';
-export * from './generation.service';
-export * from './review.service';
+export * from "./flashcard.service";
+export * from "./generation.service";
+export * from "./review.service";

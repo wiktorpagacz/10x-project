@@ -1,6 +1,6 @@
-import { defineMiddleware } from 'astro:middleware';
-import { createServerClient } from '@supabase/ssr';
-import type { Database } from '../db/database.types.ts';
+import { defineMiddleware } from "astro:middleware";
+import { createServerClient } from "@supabase/ssr";
+import type { Database } from "../db/database.types.ts";
 
 // In-memory store for rate limiting: userId -> array of request timestamps
 const rateLimitStore = new Map<string, number[]>();
@@ -37,32 +37,28 @@ function checkRateLimit(userId: string, endpoint: string): boolean {
 
 export const onRequest = defineMiddleware(async (context, next) => {
   // Create a Supabase client per request that can handle cookies
-  const supabase = createServerClient<Database>(
-    import.meta.env.SUPABASE_URL,
-    import.meta.env.SUPABASE_KEY,
-    {
-      cookies: {
-        getAll() {
-          // Get all cookies from Astro context
-          const cookieHeader = context.request.headers.get('cookie');
-          if (!cookieHeader) return [];
-          
-          return cookieHeader.split('; ').map((cookie) => {
-            const [name, ...rest] = cookie.split('=');
-            return {
-              name,
-              value: rest.join('='),
-            };
-          });
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            context.cookies.set(name, value, options);
-          });
-        },
+  const supabase = createServerClient<Database>(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_KEY, {
+    cookies: {
+      getAll() {
+        // Get all cookies from Astro context
+        const cookieHeader = context.request.headers.get("cookie");
+        if (!cookieHeader) return [];
+
+        return cookieHeader.split("; ").map((cookie) => {
+          const [name, ...rest] = cookie.split("=");
+          return {
+            name,
+            value: rest.join("="),
+          };
+        });
       },
-    }
-  );
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) => {
+          context.cookies.set(name, value, options);
+        });
+      },
+    },
+  });
 
   context.locals.supabase = supabase;
 
@@ -73,24 +69,21 @@ export const onRequest = defineMiddleware(async (context, next) => {
   context.locals.session = session;
 
   // Check rate limiting for generation endpoint
-  if (
-    context.request.method === 'POST' &&
-    context.request.url.includes('/api/generations')
-  ) {
+  if (context.request.method === "POST" && context.request.url.includes("/api/generations")) {
     const userId = session?.user?.id;
 
-    if (userId && !checkRateLimit(userId, 'POST:/api/generations')) {
+    if (userId && !checkRateLimit(userId, "POST:/api/generations")) {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'RATE_LIMITED',
-            message: 'Too many requests. Maximum 5 requests per minute allowed.',
+            code: "RATE_LIMITED",
+            message: "Too many requests. Maximum 5 requests per minute allowed.",
           },
         }),
         {
           status: 429,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
   }

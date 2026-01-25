@@ -1,6 +1,6 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { getFlashcards } from '@/lib/services/flashcard.service';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { getFlashcards } from "@/lib/services/flashcard.service";
 
 export const prerender = false;
 
@@ -12,16 +12,11 @@ export const prerender = false;
  */
 const getFlashcardsQuerySchema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  pageSize: z.coerce
-    .number()
-    .int()
-    .positive()
-    .max(100, 'Page size must not exceed 100')
-    .default(20),
+  pageSize: z.coerce.number().int().positive().max(100, "Page size must not exceed 100").default(20),
   search: z
     .string()
-    .max(200, 'Search term must not exceed 200 characters')
-    .transform(val => val.trim())
+    .max(200, "Search term must not exceed 200 characters")
+    .transform((val) => val.trim())
     .optional(),
 });
 
@@ -49,7 +44,7 @@ type GetFlashcardsQuery = z.infer<typeof getFlashcardsQuerySchema>;
  * - 401: Unauthorized (no valid session)
  * - 500: Internal server error
  */
-export const GET: APIRoute = async context => {
+export const GET: APIRoute = async (context) => {
   try {
     // Extract and validate query parameters
     const queryParams = Object.fromEntries(context.url.searchParams);
@@ -61,15 +56,15 @@ export const GET: APIRoute = async context => {
       if (validationError instanceof z.ZodError) {
         return new Response(
           JSON.stringify({
-            error: 'Validation failed',
-            details: validationError.errors.map(err => ({
-              field: err.path.join('.'),
+            error: "Validation failed",
+            details: validationError.errors.map((err) => ({
+              field: err.path.join("."),
               message: err.message,
             })),
           }),
           {
             status: 400,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json" },
           }
         );
       }
@@ -81,11 +76,11 @@ export const GET: APIRoute = async context => {
     if (!session || !session.user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
+          error: "Unauthorized",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -93,7 +88,7 @@ export const GET: APIRoute = async context => {
     // Get the Supabase client from context
     const supabase = context.locals.supabase;
     if (!supabase) {
-      throw new Error('Supabase client not available in context');
+      throw new Error("Supabase client not available in context");
     }
 
     // Call the flashcard service to retrieve paginated data
@@ -108,11 +103,11 @@ export const GET: APIRoute = async context => {
     // Return successful response
     return new Response(JSON.stringify(paginatedFlashcards), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // Log the error with context for debugging
-    console.error('GET /api/flashcards error:', {
+    console.error("GET /api/flashcards error:", {
       url: context.url.toString(),
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
@@ -121,11 +116,11 @@ export const GET: APIRoute = async context => {
     // Return generic 500 error to client (do not expose internal details)
     return new Response(
       JSON.stringify({
-        error: 'An internal server error occurred. Please try again later.',
+        error: "An internal server error occurred. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

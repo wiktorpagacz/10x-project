@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
-import type { CharacterCounterModel, TextInputCharacterCounterModel } from '../types';
+import { useMemo } from "react";
+import type { CharacterCounterModel, TextInputCharacterCounterModel } from "../types";
 
 /**
  * Reusable hook for character count calculation and validation.
- * 
+ *
  * @param text - The text to count characters for
  * @param min - Minimum required characters (optional)
  * @param max - Maximum allowed characters
@@ -19,27 +19,27 @@ export function useCharacterCounter(
   return useMemo(() => {
     const current = text.length;
     const percentage = max > 0 ? (current / max) * 100 : 0;
-    
+
     // Determine status based on validation
-    let status: 'valid' | 'warning' | 'error' = 'valid';
+    let status: "valid" | "warning" | "error" = "valid";
     let isValid = true;
-    
+
     // Check max constraint
     if (current > max) {
-      status = 'error';
+      status = "error";
       isValid = false;
     }
     // Check min constraint if provided
     else if (min !== undefined && current < min) {
-      status = 'error';
+      status = "error";
       isValid = false;
     }
     // Check warning threshold
     else if (percentage >= warningThreshold) {
-      status = 'warning';
+      status = "warning";
       // Still valid, just warning
     }
-    
+
     const baseModel: CharacterCounterModel = {
       current,
       max,
@@ -47,7 +47,7 @@ export function useCharacterCounter(
       status,
       isValid,
     };
-    
+
     // Return extended model if min is provided
     if (min !== undefined) {
       return {
@@ -55,7 +55,7 @@ export function useCharacterCounter(
         min,
       } as TextInputCharacterCounterModel;
     }
-    
+
     return baseModel;
   }, [text, min, max, warningThreshold]);
 }

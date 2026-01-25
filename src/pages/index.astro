@@ -6,7 +6,7 @@ import { GenerationView } from "@/components/generation";
 const session = Astro.locals.session;
 
 if (!session?.user?.id) {
-  return Astro.redirect('/login');
+  return Astro.redirect("/login");
 }
 ---
 

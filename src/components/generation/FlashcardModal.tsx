@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,14 +6,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { CharacterCounter } from './CharacterCounter';
-import { useCharacterCounter } from './hooks/useCharacterCounter';
-import type { FlashcardModalProps } from './types';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { CharacterCounter } from "./CharacterCounter";
+import { useCharacterCounter } from "./hooks/useCharacterCounter";
+import type { FlashcardModalProps } from "./types";
+import { cn } from "@/lib/utils";
 
 const FRONT_MAX_CHARS = 200;
 const BACK_MAX_CHARS = 500;
@@ -58,7 +58,7 @@ export function FlashcardModal({
 
   // Handle Enter key in textareas (Ctrl+Enter to save)
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && isValid) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && isValid) {
       e.preventDefault();
       handleSave();
     }
@@ -68,13 +68,11 @@ export function FlashcardModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="sm:max-w-[600px]" onKeyDown={handleKeyDown}>
         <DialogHeader>
-          <DialogTitle>
-            {isEditingMode ? 'Edit Flashcard' : 'Create New Flashcard'}
-          </DialogTitle>
+          <DialogTitle>{isEditingMode ? "Edit Flashcard" : "Create New Flashcard"}</DialogTitle>
           <DialogDescription>
             {isEditingMode
-              ? 'Make changes to the flashcard below. Your edits will be saved when you click Save.'
-              : 'Fill in both sides of the flashcard. Front should be a question or prompt, back should be the answer or explanation.'}
+              ? "Make changes to the flashcard below. Your edits will be saved when you click Save."
+              : "Fill in both sides of the flashcard. Front should be a question or prompt, back should be the answer or explanation."}
           </DialogDescription>
         </DialogHeader>
 
@@ -89,30 +87,18 @@ export function FlashcardModal({
               value={front}
               onChange={(e) => onChangeFront(e.target.value)}
               placeholder="Enter the question or prompt..."
-              className={cn(
-                'min-h-[100px] resize-y',
-                errors.front && 'border-red-500 focus-visible:ring-red-500'
-              )}
+              className={cn("min-h-[100px] resize-y", errors.front && "border-red-500 focus-visible:ring-red-500")}
               aria-invalid={!!errors.front}
               aria-describedby={errors.front ? `${frontId}-error` : undefined}
               maxLength={FRONT_MAX_CHARS}
             />
-            
+
             <div className="flex items-center justify-between">
-              <CharacterCounter
-                current={frontCounter.current}
-                max={FRONT_MAX_CHARS}
-                threshold={70}
-                label="Front"
-              />
+              <CharacterCounter current={frontCounter.current} max={FRONT_MAX_CHARS} threshold={70} label="Front" />
             </div>
 
             {errors.front && (
-              <p
-                id={`${frontId}-error`}
-                className="text-sm text-red-600 dark:text-red-400"
-                role="alert"
-              >
+              <p id={`${frontId}-error`} className="text-sm text-red-600 dark:text-red-400" role="alert">
                 {errors.front}
               </p>
             )}
@@ -128,30 +114,18 @@ export function FlashcardModal({
               value={back}
               onChange={(e) => onChangeBack(e.target.value)}
               placeholder="Enter the answer or explanation..."
-              className={cn(
-                'min-h-[120px] resize-y',
-                errors.back && 'border-red-500 focus-visible:ring-red-500'
-              )}
+              className={cn("min-h-[120px] resize-y", errors.back && "border-red-500 focus-visible:ring-red-500")}
               aria-invalid={!!errors.back}
               aria-describedby={errors.back ? `${backId}-error` : undefined}
               maxLength={BACK_MAX_CHARS}
             />
-            
+
             <div className="flex items-center justify-between">
-              <CharacterCounter
-                current={backCounter.current}
-                max={BACK_MAX_CHARS}
-                threshold={70}
-                label="Back"
-              />
+              <CharacterCounter current={backCounter.current} max={BACK_MAX_CHARS} threshold={70} label="Back" />
             </div>
 
             {errors.back && (
-              <p
-                id={`${backId}-error`}
-                className="text-sm text-red-600 dark:text-red-400"
-                role="alert"
-              >
+              <p id={`${backId}-error`} className="text-sm text-red-600 dark:text-red-400" role="alert">
                 {errors.back}
               </p>
             )}

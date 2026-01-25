@@ -1,8 +1,8 @@
-import type { Page } from '@playwright/test';
+import type { Page } from "@playwright/test";
 
 /**
  * Test helper utilities for E2E tests
- * 
+ *
  * Provides reusable functions for common test operations.
  */
 
@@ -11,7 +11,7 @@ import type { Page } from '@playwright/test';
  * Useful after form submissions or page navigations
  */
 export async function waitForNetworkIdle(page: Page, timeout = 500): Promise<void> {
-  await page.waitForLoadState('networkidle', { timeout });
+  await page.waitForLoadState("networkidle", { timeout });
 }
 
 /**
@@ -29,7 +29,7 @@ export async function mockApiResponse(
   await page.route(url, (route) => {
     route.fulfill({
       status: response.status,
-      contentType: 'application/json',
+      contentType: "application/json",
       body: JSON.stringify(response.body),
     });
   });
@@ -50,11 +50,11 @@ export async function mockSlowApiResponse(
 ): Promise<void> {
   await page.route(url, async (route) => {
     await new Promise((resolve) => setTimeout(resolve, delay));
-    
+
     if (response) {
       route.fulfill({
         status: response.status,
-        contentType: 'application/json',
+        contentType: "application/json",
         body: JSON.stringify(response.body),
       });
     } else {
@@ -69,7 +69,7 @@ export async function mockSlowApiResponse(
  */
 export async function mockApiError(page: Page, url: string, errorCode?: string): Promise<void> {
   await page.route(url, (route) => {
-    route.abort(errorCode || 'failed');
+    route.abort(errorCode || "failed");
   });
 }
 
@@ -105,11 +105,7 @@ export async function clearBrowserStorage(page: Page): Promise<void> {
  * Set localStorage item
  * Useful for setting up test state
  */
-export async function setLocalStorage(
-  page: Page,
-  key: string,
-  value: string
-): Promise<void> {
+export async function setLocalStorage(page: Page, key: string, value: string): Promise<void> {
   await page.evaluate(
     ({ key, value }) => {
       localStorage.setItem(key, value);
@@ -132,8 +128,8 @@ export async function getLocalStorage(page: Page, key: string): Promise<string |
  */
 export async function waitForElementStable(page: Page, selector: string): Promise<void> {
   const element = page.locator(selector);
-  await element.waitFor({ state: 'visible' });
-  
+  await element.waitFor({ state: "visible" });
+
   // Wait for animations to complete
   await page.waitForTimeout(100);
 }
@@ -142,10 +138,7 @@ export async function waitForElementStable(page: Page, selector: string): Promis
  * Fill form fields from object
  * Simplifies filling multiple form fields
  */
-export async function fillForm(
-  page: Page,
-  fields: Record<string, string>
-): Promise<void> {
+export async function fillForm(page: Page, fields: Record<string, string>): Promise<void> {
   for (const [testId, value] of Object.entries(fields)) {
     await page.getByTestId(testId).fill(value);
   }
@@ -164,11 +157,8 @@ export async function getValidationErrors(page: Page): Promise<string[]> {
  * Take screenshot with timestamp
  * Useful for debugging
  */
-export async function takeTimestampedScreenshot(
-  page: Page,
-  name: string
-): Promise<void> {
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+export async function takeTimestampedScreenshot(page: Page, name: string): Promise<void> {
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   await page.screenshot({
     path: `screenshots/${name}-${timestamp}.png`,
     fullPage: true,
@@ -187,16 +177,16 @@ export async function retryUntil<T>(
 ): Promise<T> {
   for (let i = 0; i < maxAttempts; i++) {
     const result = await action();
-    
+
     if (condition(result)) {
       return result;
     }
-    
+
     if (i < maxAttempts - 1) {
       await new Promise((resolve) => setTimeout(resolve, delayMs));
     }
   }
-  
+
   throw new Error(`Condition not met after ${maxAttempts} attempts`);
 }
 
@@ -205,8 +195,8 @@ export async function retryUntil<T>(
  */
 export async function hasClass(page: Page, selector: string, className: string): Promise<boolean> {
   const element = page.locator(selector);
-  const classes = await element.getAttribute('class');
-  return classes?.split(' ').includes(className) || false;
+  const classes = await element.getAttribute("class");
+  return classes?.split(" ").includes(className) || false;
 }
 
 /**
@@ -222,8 +212,8 @@ export async function waitForUrl(page: Page, pattern: string | RegExp): Promise<
  */
 export async function simulateSlowNetwork(page: Page): Promise<void> {
   const client = await page.context().newCDPSession(page);
-  await client.send('Network.enable');
-  await client.send('Network.emulateNetworkConditions', {
+  await client.send("Network.enable");
+  await client.send("Network.emulateNetworkConditions", {
     offline: false,
     downloadThroughput: (50 * 1024) / 8, // 50kb/s
     uploadThroughput: (50 * 1024) / 8,
@@ -236,5 +226,5 @@ export async function simulateSlowNetwork(page: Page): Promise<void> {
  */
 export async function resetNetworkConditions(page: Page): Promise<void> {
   const client = await page.context().newCDPSession(page);
-  await client.send('Network.disable');
+  await client.send("Network.disable");
 }

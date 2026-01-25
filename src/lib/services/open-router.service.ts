@@ -16,11 +16,11 @@ export interface GeneratedFlashcard {
  * Response from the OpenRouter API.
  */
 interface OpenRouterResponse {
-  choices: Array<{
+  choices: {
     message: {
       content: string;
     };
-  }>;
+  }[];
 }
 
 /**
@@ -30,10 +30,10 @@ export class OpenRouterError extends Error {
   constructor(
     public statusCode: number,
     public errorCode: string,
-    message: string,
+    message: string
   ) {
     super(message);
-    this.name = 'OpenRouterError';
+    this.name = "OpenRouterError";
   }
 }
 
@@ -44,17 +44,11 @@ export class OpenRouterError extends Error {
  * @returns An array of generated flashcard suggestions
  * @throws OpenRouterError if the API call fails
  */
-export async function generateFlashcards(
-  sourceText: string,
-): Promise<GeneratedFlashcard[]> {
+export async function generateFlashcards(sourceText: string): Promise<GeneratedFlashcard[]> {
   const apiKey = import.meta.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
-    throw new OpenRouterError(
-      500,
-      'MISSING_CONFIG',
-      'OpenRouter API key is not configured',
-    );
+    throw new OpenRouterError(500, "MISSING_CONFIG", "OpenRouter API key is not configured");
   }
 
   const systemPrompt = `You are an expert flashcard generator. Your task is to create high-quality flashcard questions and answers based on provided source material.
@@ -76,21 +70,21 @@ Format your response as a JSON array like this:
   const userPrompt = `Generate flashcards from this source material:\n\n${sourceText}`;
 
   try {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'liquid/lfm-2.5-1.2b-thinking:free',
+        model: "liquid/lfm-2.5-1.2b-thinking:free",
         messages: [
           {
-            role: 'system',
+            role: "system",
             content: systemPrompt,
           },
           {
-            role: 'user',
+            role: "user",
             content: userPrompt,
           },
         ],
@@ -101,24 +95,15 @@ Format your response as a JSON array like this:
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      const errorMessage =
-        errorData?.error?.message || `HTTP ${response.status}`;
+      const errorMessage = errorData?.error?.message || `HTTP ${response.status}`;
 
-      throw new OpenRouterError(
-        response.status,
-        errorData?.error?.code || 'API_ERROR',
-        errorMessage,
-      );
+      throw new OpenRouterError(response.status, errorData?.error?.code || "API_ERROR", errorMessage);
     }
 
     const data = (await response.json()) as OpenRouterResponse;
 
     if (!data.choices?.[0]?.message?.content) {
-      throw new OpenRouterError(
-        500,
-        'INVALID_RESPONSE',
-        'Unexpected response format from OpenRouter',
-      );
+      throw new OpenRouterError(500, "INVALID_RESPONSE", "Unexpected response format from OpenRouter");
     }
 
     const content = data.choices[0].message.content.trim();
@@ -126,11 +111,7 @@ Format your response as a JSON array like this:
     // Extract JSON from the response (in case there's extra text)
     const jsonMatch = content.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
-      throw new OpenRouterError(
-        500,
-        'PARSE_ERROR',
-        'Failed to extract JSON from AI response',
-      );
+      throw new OpenRouterError(500, "PARSE_ERROR", "Failed to extract JSON from AI response");
     }
 
     const flashcards = JSON.parse(jsonMatch[0]) as GeneratedFlashcard[];
@@ -139,18 +120,10 @@ Format your response as a JSON array like this:
     if (
       !Array.isArray(flashcards) ||
       !flashcards.every(
-        (fc) =>
-          typeof fc.front === 'string' &&
-          typeof fc.back === 'string' &&
-          fc.front.length > 0 &&
-          fc.back.length > 0,
+        (fc) => typeof fc.front === "string" && typeof fc.back === "string" && fc.front.length > 0 && fc.back.length > 0
       )
     ) {
-      throw new OpenRouterError(
-        500,
-        'INVALID_FLASHCARDS',
-        'Generated flashcards do not meet validation requirements',
-      );
+      throw new OpenRouterError(500, "INVALID_FLASHCARDS", "Generated flashcards do not meet validation requirements");
     }
 
     return flashcards;
@@ -162,17 +135,9 @@ Format your response as a JSON array like this:
 
     // Wrap other errors
     if (error instanceof Error) {
-      throw new OpenRouterError(
-        500,
-        'NETWORK_ERROR',
-        `Failed to call OpenRouter API: ${error.message}`,
-      );
+      throw new OpenRouterError(500, "NETWORK_ERROR", `Failed to call OpenRouter API: ${error.message}`);
     }
 
-    throw new OpenRouterError(
-      500,
-      'UNKNOWN_ERROR',
-      'An unknown error occurred while calling OpenRouter API',
-    );
+    throw new OpenRouterError(500, "UNKNOWN_ERROR", "An unknown error occurred while calling OpenRouter API");
   }
 }

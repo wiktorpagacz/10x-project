@@ -15,8 +15,8 @@
  *   - 500: Server error
  */
 
-import type { APIContext } from 'astro';
-import type { ErrorResponse } from '../../../types.ts';
+import type { APIContext } from "astro";
+import type { ErrorResponse } from "../../../types.ts";
 
 // Prevent pre-rendering for this API route
 export const prerender = false;
@@ -37,14 +37,14 @@ export async function POST(context: APIContext): Promise<Response> {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'UNAUTHORIZED',
-            message: 'Authentication required',
+            code: "UNAUTHORIZED",
+            message: "Authentication required",
           },
         } as ErrorResponse),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -53,46 +53,43 @@ export async function POST(context: APIContext): Promise<Response> {
     const { error } = await supabase.auth.signOut();
 
     if (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
 
       return new Response(
         JSON.stringify({
           error: {
-            code: 'LOGOUT_ERROR',
-            message: 'Wystąpił błąd podczas wylogowania. Spróbuj ponownie',
+            code: "LOGOUT_ERROR",
+            message: "Wystąpił błąd podczas wylogowania. Spróbuj ponownie",
           },
         } as ErrorResponse),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
     // Step 3: Return success response
     // Supabase automatically clears session cookies
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      },
-    );
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
     // Unexpected server error
-    console.error('Unexpected error in logout endpoint:', error);
+    console.error("Unexpected error in logout endpoint:", error);
 
     return new Response(
       JSON.stringify({
         error: {
-          code: 'INTERNAL_ERROR',
-          message: 'Wystąpił błąd serwera. Spróbuj ponownie później',
+          code: "INTERNAL_ERROR",
+          message: "Wystąpił błąd serwera. Spróbuj ponownie później",
         },
       } as ErrorResponse),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

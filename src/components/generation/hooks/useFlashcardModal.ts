@@ -1,17 +1,14 @@
-import { useState, useCallback } from 'react';
-import type { FlashcardModalState } from '../types';
+import { useState, useCallback } from "react";
+import type { FlashcardModalState } from "../types";
 
 /**
  * Hook managing FlashcardModal state and validation.
- * 
+ *
  * @param initialFront - Initial front value (optional)
  * @param initialBack - Initial back value (optional)
  * @returns Modal state and helper functions
  */
-export function useFlashcardModal(
-  initialFront = '',
-  initialBack = ''
-) {
+export function useFlashcardModal(initialFront = "", initialBack = "") {
   const [state, setState] = useState<FlashcardModalState>({
     isOpen: false,
     isEditingMode: false,
@@ -37,24 +34,24 @@ export function useFlashcardModal(
   }, []);
 
   const validate = useCallback((): boolean => {
-    const errors: FlashcardModalState['errors'] = {};
+    const errors: FlashcardModalState["errors"] = {};
     let isValid = true;
 
     // Validate front
     if (state.front.trim().length === 0) {
-      errors.front = 'Front side is required.';
+      errors.front = "Front side is required.";
       isValid = false;
     } else if (state.front.length > 200) {
-      errors.front = 'Front side cannot exceed 200 characters.';
+      errors.front = "Front side cannot exceed 200 characters.";
       isValid = false;
     }
 
     // Validate back
     if (state.back.trim().length === 0) {
-      errors.back = 'Back side is required.';
+      errors.back = "Back side is required.";
       isValid = false;
     } else if (state.back.length > 500) {
-      errors.back = 'Back side cannot exceed 500 characters.';
+      errors.back = "Back side cannot exceed 500 characters.";
       isValid = false;
     }
 
@@ -66,8 +63,8 @@ export function useFlashcardModal(
     setState({
       isOpen: false,
       isEditingMode: false,
-      front: '',
-      back: '',
+      front: "",
+      back: "",
       errors: {},
     });
   }, []);
@@ -76,8 +73,8 @@ export function useFlashcardModal(
     setState({
       isOpen: true,
       isEditingMode: false,
-      front: '',
-      back: '',
+      front: "",
+      back: "",
       errors: {},
     });
   }, []);

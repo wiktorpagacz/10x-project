@@ -5,13 +5,10 @@ import { RegisterForm } from "@/components/auth";
 // Server-side session check - redirect if already authenticated
 const session = Astro.locals.session;
 if (session?.user?.id) {
-  return Astro.redirect('/');
+  return Astro.redirect("/");
 }
 ---
 
-<AuthLayout
-  title="Rejestracja - 10xCards"
-  description="Utwórz nowe konto w 10xCards"
->
+<AuthLayout title="Rejestracja - 10xCards" description="Utwórz nowe konto w 10xCards">
   <RegisterForm client:load />
 </AuthLayout>

@@ -21,13 +21,9 @@
  *   - 500: Server error
  */
 
-import type { APIContext } from 'astro';
-import { z } from 'zod';
-import type {
-  RegisterRequestDto,
-  AuthSuccessResponseDto,
-  ErrorResponse,
-} from '../../../types.ts';
+import type { APIContext } from "astro";
+import { z } from "zod";
+import type { RegisterRequestDto, AuthSuccessResponseDto, ErrorResponse } from "../../../types.ts";
 
 // Prevent pre-rendering for this API route
 export const prerender = false;
@@ -38,18 +34,13 @@ export const prerender = false;
  */
 const registerSchema = z
   .object({
-    email: z
-      .string()
-      .min(1, 'Email jest wymagany')
-      .email('Wprowadź poprawny adres email'),
-    password: z
-      .string()
-      .min(8, 'Hasło musi mieć co najmniej 8 znaków'),
-    confirmPassword: z.string().min(1, 'Potwierdź swoje hasło'),
+    email: z.string().min(1, "Email jest wymagany").email("Wprowadź poprawny adres email"),
+    password: z.string().min(8, "Hasło musi mieć co najmniej 8 znaków"),
+    confirmPassword: z.string().min(1, "Potwierdź swoje hasło"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Hasła nie są zgodne',
-    path: ['confirmPassword'],
+    message: "Hasła nie są zgodne",
+    path: ["confirmPassword"],
   });
 
 /**
@@ -70,14 +61,14 @@ export async function POST(context: APIContext): Promise<Response> {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'INVALID_JSON',
-            message: 'Request body must be valid JSON',
+            code: "INVALID_JSON",
+            message: "Request body must be valid JSON",
           },
         } as ErrorResponse),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -90,15 +81,15 @@ export async function POST(context: APIContext): Promise<Response> {
       return new Response(
         JSON.stringify({
           error: {
-            code: 'VALIDATION_ERROR',
+            code: "VALIDATION_ERROR",
             message: firstError.message,
             field: firstError.path[0] as string,
           },
         } as ErrorResponse),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -120,60 +111,57 @@ export async function POST(context: APIContext): Promise<Response> {
     // Step 4: Handle registration errors
     if (error) {
       // Map Supabase errors to user-friendly messages
-      let errorMessage = 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie';
-      let errorCode = 'REGISTRATION_ERROR';
+      let errorMessage = "Wystąpił błąd podczas rejestracji. Spróbuj ponownie";
+      let errorCode = "REGISTRATION_ERROR";
       let statusCode = 500;
 
       // Specific error handling for better UX
-      if (
-        error.message.includes('User already registered') ||
-        error.message.includes('already been registered')
-      ) {
-        errorMessage = 'Email jest już zajęty';
-        errorCode = 'EMAIL_TAKEN';
+      if (error.message.includes("User already registered") || error.message.includes("already been registered")) {
+        errorMessage = "Email jest już zajęty";
+        errorCode = "EMAIL_TAKEN";
         statusCode = 409; // Conflict
-      } else if (error.message.includes('Password should be')) {
-        errorMessage = 'Hasło nie spełnia wymagań bezpieczeństwa';
-        errorCode = 'WEAK_PASSWORD';
+      } else if (error.message.includes("Password should be")) {
+        errorMessage = "Hasło nie spełnia wymagań bezpieczeństwa";
+        errorCode = "WEAK_PASSWORD";
         statusCode = 400;
-      } else if (error.message.includes('Invalid email')) {
-        errorMessage = 'Wprowadź poprawny adres email';
-        errorCode = 'INVALID_EMAIL';
+      } else if (error.message.includes("Invalid email")) {
+        errorMessage = "Wprowadź poprawny adres email";
+        errorCode = "INVALID_EMAIL";
         statusCode = 400;
       }
 
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
 
       return new Response(
         JSON.stringify({
           error: {
             code: errorCode,
             message: errorMessage,
-            ...(errorCode === 'EMAIL_TAKEN' && { field: 'email' }),
+            ...(errorCode === "EMAIL_TAKEN" && { field: "email" }),
           },
         } as ErrorResponse),
         {
           status: statusCode,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
     // Step 5: Validate response data
     if (!data.user) {
-      console.error('Registration succeeded but no user returned');
+      console.error("Registration succeeded but no user returned");
 
       return new Response(
         JSON.stringify({
           error: {
-            code: 'REGISTRATION_ERROR',
-            message: 'Wystąpił błąd podczas rejestracji. Spróbuj ponownie',
+            code: "REGISTRATION_ERROR",
+            message: "Wystąpił błąd podczas rejestracji. Spróbuj ponownie",
           },
         } as ErrorResponse),
         {
           status: 500,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -187,14 +175,14 @@ export async function POST(context: APIContext): Promise<Response> {
           success: true,
           user: {
             id: data.user.id,
-            email: data.user.email!,
+            email: data.user.email ?? "",
           },
           requiresEmailConfirmation: true,
         }),
         {
           status: 201,
-          headers: { 'Content-Type': 'application/json' },
-        },
+          headers: { "Content-Type": "application/json" },
+        }
       );
     }
 
@@ -206,29 +194,29 @@ export async function POST(context: APIContext): Promise<Response> {
         success: true,
         user: {
           id: data.user.id,
-          email: data.user.email!,
+          email: data.user.email ?? "",
         },
       } as AuthSuccessResponseDto),
       {
         status: 201,
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { "Content-Type": "application/json" },
+      }
     );
   } catch (error) {
     // Unexpected server error
-    console.error('Unexpected error in registration endpoint:', error);
+    console.error("Unexpected error in registration endpoint:", error);
 
     return new Response(
       JSON.stringify({
         error: {
-          code: 'INTERNAL_ERROR',
-          message: 'Wystąpił błąd serwera. Spróbuj ponownie później',
+          code: "INTERNAL_ERROR",
+          message: "Wystąpił błąd serwera. Spróbuj ponownie później",
         },
       } as ErrorResponse),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      },
+        headers: { "Content-Type": "application/json" },
+      }
     );
   }
 }

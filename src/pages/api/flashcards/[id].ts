@@ -1,7 +1,6 @@
-import type { APIRoute } from 'astro';
-import { z } from 'zod';
-import { getFlashcardById, updateFlashcard, deleteFlashcard } from '@/lib/services/flashcard.service';
-import type { FlashcardDto } from 'src/types';
+import type { APIRoute } from "astro";
+import { z } from "zod";
+import { getFlashcardById, updateFlashcard, deleteFlashcard } from "@/lib/services/flashcard.service";
 
 export const prerender = false;
 
@@ -14,13 +13,13 @@ export const prerender = false;
  */
 const updateFlashcardSchema = z
   .object({
-    front: z.string().min(1, 'Front must not be empty').max(200, 'Front must not exceed 200 characters').optional(),
-    back: z.string().min(1, 'Back must not be empty').max(500, 'Back must not exceed 500 characters').optional(),
+    front: z.string().min(1, "Front must not be empty").max(200, "Front must not exceed 200 characters").optional(),
+    back: z.string().min(1, "Back must not be empty").max(500, "Back must not exceed 500 characters").optional(),
   })
   .strict()
-  .refine(data => data.front !== undefined || data.back !== undefined, {
+  .refine((data) => data.front !== undefined || data.back !== undefined, {
     message: "At least one of 'front' or 'back' must be provided",
-    path: ['body'],
+    path: ["body"],
   });
 
 type UpdateFlashcardRequest = z.infer<typeof updateFlashcardSchema>;
@@ -32,12 +31,10 @@ type UpdateFlashcardRequest = z.infer<typeof updateFlashcardSchema>;
 const pathParamSchema = z.object({
   id: z
     .string()
-    .regex(/^\d+$/, 'Invalid flashcard ID format')
+    .regex(/^\d+$/, "Invalid flashcard ID format")
     .transform(Number)
-    .pipe(z.number().positive('ID must be a positive integer')),
+    .pipe(z.number().positive("ID must be a positive integer")),
 });
-
-type PathParams = z.infer<typeof pathParamSchema>;
 
 /**
  * GET /api/flashcards/[id]
@@ -65,18 +62,18 @@ type PathParams = z.infer<typeof pathParamSchema>;
  * - 404: Flashcard not found (does not exist or belongs to another user)
  * - 500: Internal server error
  */
-export const GET: APIRoute = async context => {
+export const GET: APIRoute = async (context) => {
   try {
     // Verify user is authenticated
     const session = context.locals.session;
     if (!session || !session.user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
+          error: "Unauthorized",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -84,7 +81,7 @@ export const GET: APIRoute = async context => {
     // Get the Supabase client from context
     const supabase = context.locals.supabase;
     if (!supabase) {
-      throw new Error('Supabase client not available in context');
+      throw new Error("Supabase client not available in context");
     }
 
     // Extract and validate the ID path parameter
@@ -93,11 +90,11 @@ export const GET: APIRoute = async context => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: 'Invalid flashcard ID format',
+          error: "Invalid flashcard ID format",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -109,63 +106,56 @@ export const GET: APIRoute = async context => {
       if (!Number.isInteger(flashcardId) || flashcardId <= 0) {
         return new Response(
           JSON.stringify({
-            error: 'Invalid flashcard ID format',
+            error: "Invalid flashcard ID format",
           }),
           {
             status: 400,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json" },
           }
         );
       }
     } catch {
       return new Response(
         JSON.stringify({
-          error: 'Invalid flashcard ID format',
+          error: "Invalid flashcard ID format",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // Retrieve the flashcard from the service
-    const flashcard = await getFlashcardById(
-      supabase,
-      session.user.id,
-      flashcardId
-    );
+    const flashcard = await getFlashcardById(supabase, session.user.id, flashcardId);
 
     // Handle not found case
     if (!flashcard) {
       return new Response(
         JSON.stringify({
-          error: 'Flashcard not found',
+          error: "Flashcard not found",
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
 
     // Return the flashcard data
-    return new Response(
-      JSON.stringify(flashcard),
-      {
-        status: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'private, no-cache',
-        },
-      }
-    );
+    return new Response(JSON.stringify(flashcard), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "private, no-cache",
+      },
+    });
   } catch (error) {
     // Log the error with context for debugging
     const userId = context.locals.session?.user?.id;
     const flashcardId = context.params?.id;
 
-    console.error('Error in GET /api/flashcards/[id]:', {
+    console.error("Error in GET /api/flashcards/[id]:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),
@@ -175,11 +165,11 @@ export const GET: APIRoute = async context => {
     // Return a generic 500 error response without exposing internal details
     return new Response(
       JSON.stringify({
-        error: 'An internal server error occurred. Please try again later.',
+        error: "An internal server error occurred. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
@@ -222,7 +212,7 @@ export const GET: APIRoute = async context => {
  * - 404: Flashcard not found
  * - 500: Internal server error
  */
-export const PUT: APIRoute = async context => {
+export const PUT: APIRoute = async (context) => {
   try {
     // Step 1: Validate path parameter
     const pathParams = pathParamSchema.safeParse({
@@ -232,15 +222,15 @@ export const PUT: APIRoute = async context => {
     if (!pathParams.success) {
       return new Response(
         JSON.stringify({
-          error: 'Validation failed',
-          details: pathParams.error.errors.map(err => ({
-            field: err.path.join('.') || 'id',
+          error: "Validation failed",
+          details: pathParams.error.errors.map((err) => ({
+            field: err.path.join(".") || "id",
             message: err.message,
           })),
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -252,11 +242,11 @@ export const PUT: APIRoute = async context => {
     if (!session || !session.user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
+          error: "Unauthorized",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -266,7 +256,7 @@ export const PUT: APIRoute = async context => {
     // Step 3: Get the Supabase client from context
     const supabase = context.locals.supabase;
     if (!supabase) {
-      throw new Error('Supabase client not available in context');
+      throw new Error("Supabase client not available in context");
     }
 
     // Step 4: Parse and validate request body
@@ -276,17 +266,17 @@ export const PUT: APIRoute = async context => {
     } catch {
       return new Response(
         JSON.stringify({
-          error: 'Validation failed',
+          error: "Validation failed",
           details: [
             {
-              field: 'body',
-              message: 'Invalid JSON payload',
+              field: "body",
+              message: "Invalid JSON payload",
             },
           ],
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -296,15 +286,15 @@ export const PUT: APIRoute = async context => {
     if (!bodyValidation.success) {
       return new Response(
         JSON.stringify({
-          error: 'Validation failed',
+          error: "Validation failed",
           details: bodyValidation.error.errors.map((err: z.ZodIssue) => ({
-            field: err.path.join('.') || 'body',
+            field: err.path.join(".") || "body",
             message: err.message,
           })),
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -321,11 +311,11 @@ export const PUT: APIRoute = async context => {
     if (!updatedFlashcard) {
       return new Response(
         JSON.stringify({
-          error: 'Flashcard not found',
+          error: "Flashcard not found",
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -333,18 +323,18 @@ export const PUT: APIRoute = async context => {
     // Step 7: Return success response with updated flashcard
     return new Response(JSON.stringify(updatedFlashcard), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // Step 8: Handle ownership violations (403 Forbidden)
-    if (error instanceof Error && error.message === 'OWNERSHIP_VIOLATION') {
+    if (error instanceof Error && error.message === "OWNERSHIP_VIOLATION") {
       return new Response(
         JSON.stringify({
-          error: 'Forbidden. You do not have permission to update this flashcard.',
+          error: "Forbidden. You do not have permission to update this flashcard.",
         }),
         {
           status: 403,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -353,7 +343,7 @@ export const PUT: APIRoute = async context => {
     const userId = context.locals.session?.user?.id;
     const flashcardId = context.params?.id;
 
-    console.error('Error in PUT /api/flashcards/[id]:', {
+    console.error("Error in PUT /api/flashcards/[id]:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),
@@ -363,11 +353,11 @@ export const PUT: APIRoute = async context => {
     // Return a generic 500 error response without exposing internal details
     return new Response(
       JSON.stringify({
-        error: 'An internal server error occurred. Please try again later.',
+        error: "An internal server error occurred. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
@@ -393,18 +383,18 @@ export const PUT: APIRoute = async context => {
  * - 404: Flashcard not found
  * - 500: Internal server error
  */
-export const DELETE: APIRoute = async context => {
+export const DELETE: APIRoute = async (context) => {
   try {
     // Step 1: Verify user is authenticated
     const session = context.locals.session;
     if (!session || !session.user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
+          error: "Unauthorized",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -414,7 +404,7 @@ export const DELETE: APIRoute = async context => {
     // Step 2: Get the Supabase client from context
     const supabase = context.locals.supabase;
     if (!supabase) {
-      throw new Error('Supabase client not available in context');
+      throw new Error("Supabase client not available in context");
     }
 
     // Step 3: Extract and validate the ID path parameter
@@ -423,12 +413,12 @@ export const DELETE: APIRoute = async context => {
     if (!id) {
       return new Response(
         JSON.stringify({
-          error: 'Invalid request parameter',
+          error: "Invalid request parameter",
           details: "The 'id' parameter must be a positive integer.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -440,24 +430,24 @@ export const DELETE: APIRoute = async context => {
       if (!Number.isInteger(flashcardId) || flashcardId <= 0) {
         return new Response(
           JSON.stringify({
-            error: 'Invalid request parameter',
+            error: "Invalid request parameter",
             details: "The 'id' parameter must be a positive integer.",
           }),
           {
             status: 400,
-            headers: { 'Content-Type': 'application/json' },
+            headers: { "Content-Type": "application/json" },
           }
         );
       }
     } catch {
       return new Response(
         JSON.stringify({
-          error: 'Invalid request parameter',
+          error: "Invalid request parameter",
           details: "The 'id' parameter must be a positive integer.",
         }),
         {
           status: 400,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -469,11 +459,11 @@ export const DELETE: APIRoute = async context => {
     if (!wasDeleted) {
       return new Response(
         JSON.stringify({
-          error: 'Flashcard not found',
+          error: "Flashcard not found",
         }),
         {
           status: 404,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -481,14 +471,14 @@ export const DELETE: APIRoute = async context => {
     // Step 5: Return 204 No Content on successful deletion
     return new Response(null, {
       status: 204,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
     // Log the error with context for debugging
     const userId = context.locals.session?.user?.id;
     const flashcardId = context.params?.id;
 
-    console.error('Error in DELETE /api/flashcards/[id]:', {
+    console.error("Error in DELETE /api/flashcards/[id]:", {
       userId,
       flashcardId,
       error: error instanceof Error ? error.message : String(error),
@@ -498,11 +488,11 @@ export const DELETE: APIRoute = async context => {
     // Return a generic 500 error response without exposing internal details
     return new Response(
       JSON.stringify({
-        error: 'An internal server error occurred. Please try again later.',
+        error: "An internal server error occurred. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }

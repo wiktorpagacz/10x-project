@@ -1,6 +1,5 @@
-import type { APIRoute } from 'astro';
-import { getFlashcardsDueForReview } from '@/lib/services/review.service';
-import type { ReviewFlashcardDto } from '@/types';
+import type { APIRoute } from "astro";
+import { getFlashcardsDueForReview } from "@/lib/services/review.service";
 
 export const prerender = false;
 
@@ -33,18 +32,18 @@ export const prerender = false;
  * - 401: Unauthorized (no valid session)
  * - 500: Internal server error
  */
-export const GET: APIRoute = async context => {
+export const GET: APIRoute = async (context) => {
   try {
     // Verify user is authenticated
     const session = context.locals.session;
     if (!session || !session.user) {
       return new Response(
         JSON.stringify({
-          error: 'Unauthorized',
+          error: "Unauthorized",
         }),
         {
           status: 401,
-          headers: { 'Content-Type': 'application/json' },
+          headers: { "Content-Type": "application/json" },
         }
       );
     }
@@ -52,27 +51,24 @@ export const GET: APIRoute = async context => {
     // Get the Supabase client from context
     const supabase = context.locals.supabase;
     if (!supabase) {
-      throw new Error('Supabase client not available in context');
+      throw new Error("Supabase client not available in context");
     }
 
     // Call the review service to retrieve flashcards due for review
-    const flashcards = await getFlashcardsDueForReview(
-      supabase,
-      session.user.id
-    );
+    const flashcards = await getFlashcardsDueForReview(supabase, session.user.id);
 
     // Return successful response with the array of flashcards
     return new Response(JSON.stringify(flashcards), {
       status: 200,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         // Prevent caching of user-specific data
-        'Cache-Control': 'private, no-cache',
+        "Cache-Control": "private, no-cache",
       },
     });
   } catch (error) {
     // Log the error with context for debugging
-    console.error('GET /api/reviews error:', {
+    console.error("GET /api/reviews error:", {
       url: context.url.toString(),
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
@@ -81,11 +77,11 @@ export const GET: APIRoute = async context => {
     // Return generic 500 error to client (do not expose internal details)
     return new Response(
       JSON.stringify({
-        error: 'An internal server error occurred. Please try again later.',
+        error: "An internal server error occurred. Please try again later.",
       }),
       {
         status: 500,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
