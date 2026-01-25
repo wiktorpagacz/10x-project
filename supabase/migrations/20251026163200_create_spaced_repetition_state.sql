@@ -7,14 +7,19 @@ CREATE TABLE spaced_repetition_state (
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   flashcard_id BIGINT NOT NULL REFERENCES flashcards(id) ON DELETE CASCADE,
   next_review_date DATE NOT NULL DEFAULT CURRENT_DATE,
-  interval INTEGER NOT NULL DEFAULT 1 COMMENT 'Number of days between reviews (SM-2)',
-  ease_factor FLOAT NOT NULL DEFAULT 2.5 COMMENT 'Ease factor for the flashcard (SM-2)',
-  repetitions INTEGER NOT NULL DEFAULT 0 COMMENT 'Number of times the flashcard has been reviewed',
+  interval INTEGER NOT NULL DEFAULT 1, -- Number of days between reviews (SM-2)
+  ease_factor FLOAT NOT NULL DEFAULT 2.5, -- Ease factor for the flashcard (SM-2)
+  repetitions INTEGER NOT NULL DEFAULT 0, -- Number of times the flashcard has been reviewed
   last_reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   UNIQUE(user_id, flashcard_id)
 );
+
+-- Add column comments
+COMMENT ON COLUMN spaced_repetition_state.interval IS 'Number of days between reviews (SM-2)';
+COMMENT ON COLUMN spaced_repetition_state.ease_factor IS 'Ease factor for the flashcard (SM-2)';
+COMMENT ON COLUMN spaced_repetition_state.repetitions IS 'Number of times the flashcard has been reviewed';
 
 -- Create indexes for optimal query performance
 -- Index on user_id for filtering by user
