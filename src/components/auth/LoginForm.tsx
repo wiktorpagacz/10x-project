@@ -3,6 +3,7 @@ import { AuthFormWrapper } from './AuthFormWrapper';
 import { PasswordInput } from './PasswordInput';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import type { AuthSuccessResponseDto, ErrorResponse } from '@/types';
 
 /**
  * Login form component with client-side validation.
@@ -15,7 +16,9 @@ export function LoginForm() {
     setPassword,
     validateForm,
     setGeneralError,
+    setFieldError,
     setIsLoading,
+    resetErrors,
   } = useLoginForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,30 +30,42 @@ export function LoginForm() {
     }
 
     setIsLoading(true);
+    resetErrors(); // Clear any previous errors
 
     try {
-      // TODO: API call will be implemented in backend phase
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     email: formState.email,
-      //     password: formState.password,
-      //   }),
-      // });
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formState.email,
+          password: formState.password,
+        }),
+      });
 
-      // if (!response.ok) {
-      //   const error = await response.json();
-      //   setGeneralError('Nieprawidłowy login lub hasło');
-      //   return;
-      // }
+      const data = await response.json();
 
-      // window.location.href = '/';
+      if (!response.ok) {
+        const errorData = data as ErrorResponse;
+        
+        // Handle field-specific errors
+        if (errorData.error.field === 'email') {
+          setFieldError('email', errorData.error.message);
+        } else if (errorData.error.field === 'password') {
+          setFieldError('password', errorData.error.message);
+        } else {
+          // General error (invalid credentials, etc.)
+          setGeneralError(errorData.error.message);
+        }
+        
+        return;
+      }
 
-      // Temporary mock behavior
-      console.log('Login attempt:', { email: formState.email });
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setGeneralError('Backend not yet implemented');
+      // Success! Redirect to home page (generation view per US-007)
+      const successData = data as AuthSuccessResponseDto;
+      console.log('Login successful:', successData.user.email);
+      
+      // Per Option B from Q5: React handles redirect
+      window.location.href = '/';
     } catch (error) {
       setGeneralError('Wystąpił błąd. Spróbuj ponownie');
       console.error('Login error:', error);

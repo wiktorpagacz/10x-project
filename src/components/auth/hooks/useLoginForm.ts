@@ -17,6 +17,7 @@ interface UseLoginFormReturn {
   setPassword: (password: string) => void;
   validateForm: () => boolean;
   setGeneralError: (error: string) => void;
+  setFieldError: (field: 'email' | 'password', error: string) => void;
   setIsLoading: (loading: boolean) => void;
   resetErrors: () => void;
 }
@@ -74,6 +75,13 @@ export function useLoginForm(): UseLoginFormReturn {
     }));
   }, []);
 
+  const setFieldError = useCallback((field: 'email' | 'password', error: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      errors: { ...prev.errors, [field]: error },
+    }));
+  }, []);
+
   const setIsLoading = useCallback((loading: boolean) => {
     setFormState((prev) => ({ ...prev, isLoading: loading }));
   }, []);
@@ -88,6 +96,7 @@ export function useLoginForm(): UseLoginFormReturn {
     setPassword,
     validateForm,
     setGeneralError,
+    setFieldError,
     setIsLoading,
     resetErrors,
   };

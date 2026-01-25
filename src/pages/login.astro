@@ -2,11 +2,11 @@
 import AuthLayout from "@/layouts/AuthLayout.astro";
 import { LoginForm } from "@/components/auth";
 
-// TODO: Server-side session check will be implemented in backend phase
-// const user = Astro.locals.user;
-// if (user) {
-//   return Astro.redirect('/');
-// }
+// Server-side session check - redirect if already authenticated
+const session = Astro.locals.session;
+if (session?.user?.id) {
+  return Astro.redirect('/');
+}
 ---
 
 <AuthLayout

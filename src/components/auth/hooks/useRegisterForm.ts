@@ -20,6 +20,7 @@ interface UseRegisterFormReturn {
   setConfirmPassword: (password: string) => void;
   validateForm: () => boolean;
   setGeneralError: (error: string) => void;
+  setFieldError: (field: 'email' | 'password' | 'confirmPassword', error: string) => void;
   setIsLoading: (loading: boolean) => void;
   resetErrors: () => void;
 }
@@ -95,6 +96,16 @@ export function useRegisterForm(): UseRegisterFormReturn {
     }));
   }, []);
 
+  const setFieldError = useCallback(
+    (field: 'email' | 'password' | 'confirmPassword', error: string) => {
+      setFormState((prev) => ({
+        ...prev,
+        errors: { ...prev.errors, [field]: error },
+      }));
+    },
+    [],
+  );
+
   const setIsLoading = useCallback((loading: boolean) => {
     setFormState((prev) => ({ ...prev, isLoading: loading }));
   }, []);
@@ -110,6 +121,7 @@ export function useRegisterForm(): UseRegisterFormReturn {
     setConfirmPassword,
     validateForm,
     setGeneralError,
+    setFieldError,
     setIsLoading,
     resetErrors,
   };

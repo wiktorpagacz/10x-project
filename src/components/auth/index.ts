@@ -8,6 +8,7 @@ export { RegisterForm } from './RegisterForm';
 export { RecoverPasswordForm } from './RecoverPasswordForm';
 export { PasswordInput } from './PasswordInput';
 export { AuthFormWrapper } from './AuthFormWrapper';
+export { LogoutButton } from './LogoutButton';
 
 // Hooks
 export { useLoginForm } from './hooks/useLoginForm';

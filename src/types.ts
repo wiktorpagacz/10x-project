@@ -159,3 +159,50 @@ export type GenerationErrorLogDto = Pick<
     GenerationErrorLog,
     'id' | 'error_code' | 'error_message' | 'model' | 'source_text_hash' | 'source_text_length' | 'created_at' | 'user_id'
   >;
+
+// ################################################################# //
+// ##################### AUTHENTICATION DTOs ####################### //
+// ################################################################# //
+
+/**
+ * Request body for user login.
+ * Used by POST /api/auth/login endpoint.
+ */
+export interface LoginRequestDto {
+  email: string;
+  password: string;
+}
+
+/**
+ * Request body for user registration.
+ * Used by POST /api/auth/register endpoint.
+ */
+export interface RegisterRequestDto {
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
+/**
+ * Successful authentication response.
+ * Returned after successful login or registration.
+ */
+export interface AuthSuccessResponseDto {
+  success: true;
+  user: {
+    id: string;
+    email: string;
+  };
+}
+
+/**
+ * Generic error response structure.
+ * Used across all API endpoints for consistency.
+ */
+export interface ErrorResponse {
+  error: {
+    code: string;
+    message: string;
+    field?: string; // Optional field for field-specific validation errors
+  };
+}
