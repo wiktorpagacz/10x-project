@@ -100,7 +100,6 @@ export function RegisterForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="twoj@email.com"
           disabled={formState.isLoading}
-          required
           className={`
             w-full px-3 py-2 rounded-md border bg-background
             transition-colors
@@ -126,7 +125,6 @@ export function RegisterForm() {
         onChange={setPassword}
         error={formState.errors.password}
         disabled={formState.isLoading}
-        required
       />
 
       {/* Confirm Password Input */}
@@ -137,7 +135,6 @@ export function RegisterForm() {
         onChange={setConfirmPassword}
         error={formState.errors.confirmPassword}
         disabled={formState.isLoading}
-        required
       />
 
       {/* Submit Button */}

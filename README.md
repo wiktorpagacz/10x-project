@@ -93,8 +93,7 @@
 - **`npm run test:e2e:ui`** – Opens Playwright UI for interactive E2E testing.
 - **`npm run test:e2e:debug`** – Runs E2E tests in debug mode.
 - **`npm run test:e2e:codegen`** – Records browser interactions to generate tests.
-
-For complete testing documentation, see [TESTING.md](TESTING.md).
+- **`npm run dev:e2e`** – Starts dev server in test mode (loads .env.test).
 
 ## Project Scope
 The MVP of 10xCards includes:

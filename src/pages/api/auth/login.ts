@@ -57,6 +57,22 @@ export async function POST(context: APIContext): Promise<Response> {
 
     try {
       requestBody = await context.request.json();
+      
+      // Ensure body is an object (not a primitive or array)
+      if (typeof requestBody !== 'object' || requestBody === null || Array.isArray(requestBody)) {
+        return new Response(
+          JSON.stringify({
+            error: {
+              code: 'INVALID_JSON',
+              message: 'Request body must be a valid JSON object',
+            },
+          } as ErrorResponse),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' },
+          },
+        );
+      }
     } catch {
       return new Response(
         JSON.stringify({

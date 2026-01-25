@@ -28,16 +28,17 @@ export function AuthFormWrapper({
         )}
       </div>
 
-      {generalError && (
+      {generalError ? (
         <div
           className="p-3 rounded-md bg-destructive/10 border border-destructive/20"
           role="alert"
+          data-testid="auth-general-error"
         >
           <p className="text-sm text-destructive">{generalError}</p>
         </div>
-      )}
+      ) : null}
 
-      <form onSubmit={onSubmit} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4" data-testid="auth-form" noValidate>
         {children}
       </form>
     </div>

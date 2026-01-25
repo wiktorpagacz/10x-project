@@ -96,7 +96,7 @@ export function LoginForm() {
           onChange={(e) => setEmail(e.target.value)}
           placeholder="twoj@email.com"
           disabled={formState.isLoading}
-          required
+          data-testid="login-email-input"
           className={`
             w-full px-3 py-2 rounded-md border bg-background
             transition-colors
@@ -107,11 +107,11 @@ export function LoginForm() {
           aria-invalid={formState.errors.email ? 'true' : 'false'}
           aria-describedby={formState.errors.email ? 'email-error' : undefined}
         />
-        {formState.errors.email && (
-          <p id="email-error" className="text-sm text-destructive" role="alert">
+        {formState.errors.email ? (
+          <p id="email-error" className="text-sm text-destructive" role="alert" data-testid="login-email-error">
             {formState.errors.email}
           </p>
-        )}
+        ) : null}
       </div>
 
       {/* Password Input */}
@@ -122,7 +122,7 @@ export function LoginForm() {
         onChange={setPassword}
         error={formState.errors.password}
         disabled={formState.isLoading}
-        required
+        data-testid="login-password-input"
       />
 
       {/* Submit Button */}
@@ -130,6 +130,7 @@ export function LoginForm() {
         type="submit"
         className="w-full"
         disabled={formState.isLoading}
+        data-testid="login-submit-button"
       >
         {formState.isLoading ? 'Logowanie...' : 'Zaloguj się'}
       </Button>
@@ -140,6 +141,7 @@ export function LoginForm() {
         <a
           href="/register"
           className="text-primary hover:underline font-medium"
+          data-testid="login-register-link"
         >
           Zarejestruj się
         </a>

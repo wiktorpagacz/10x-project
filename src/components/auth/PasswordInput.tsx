@@ -9,7 +9,7 @@ interface PasswordInputProps {
   error?: string;
   placeholder?: string;
   disabled?: boolean;
-  required?: boolean;
+  'data-testid'?: string;
 }
 
 /**
@@ -23,7 +23,7 @@ export function PasswordInput({
   error,
   placeholder = '••••••••',
   disabled = false,
-  required = false,
+  'data-testid': dataTestId,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -31,7 +31,7 @@ export function PasswordInput({
     <div className="space-y-2">
       <Label htmlFor={id} className={error ? 'text-destructive' : ''}>
         {label}
-        {required && <span className="text-destructive ml-1">*</span>}
+        <span className="text-destructive ml-1">*</span>
       </Label>
       <div className="relative">
         <input
@@ -41,7 +41,7 @@ export function PasswordInput({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          required={required}
+          data-testid={dataTestId}
           className={`
             w-full px-3 py-2 pr-10 rounded-md border bg-background
             transition-colors
@@ -56,6 +56,7 @@ export function PasswordInput({
           type="button"
           onClick={() => setShowPassword(!showPassword)}
           disabled={disabled}
+          data-testid={dataTestId ? `${dataTestId}-toggle` : undefined}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed"
           aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
         >
@@ -92,11 +93,11 @@ export function PasswordInput({
           )}
         </button>
       </div>
-      {error && (
-        <p id={`${id}-error`} className="text-sm text-destructive" role="alert">
+      {error ? (
+        <p id={`${id}-error`} className="text-sm text-destructive" role="alert" data-testid={dataTestId ? `${dataTestId}-error` : undefined}>
           {error}
         </p>
-      )}
+      ) : null}
     </div>
   );
 }

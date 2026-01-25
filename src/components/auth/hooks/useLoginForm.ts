@@ -51,20 +51,26 @@ export function useLoginForm(): UseLoginFormReturn {
 
   const validateForm = useCallback((): boolean => {
     const errors: LoginFormState['errors'] = {};
+    
+    // Get current state synchronously
+    const currentEmail = formState.email;
+    const currentPassword = formState.password;
 
     // Email validation
-    if (!formState.email) {
+    if (!currentEmail) {
       errors.email = 'Email jest wymagany';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email)) {
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentEmail)) {
       errors.email = 'Wprowadź poprawny adres email';
     }
 
     // Password validation
-    if (!formState.password) {
+    if (!currentPassword) {
       errors.password = 'Hasło jest wymagane';
     }
 
+    // Update state with errors
     setFormState((prev) => ({ ...prev, errors }));
+    
     return Object.keys(errors).length === 0;
   }, [formState.email, formState.password]);
 

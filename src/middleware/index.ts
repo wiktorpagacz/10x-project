@@ -1,6 +1,6 @@
 import { defineMiddleware } from 'astro:middleware';
-
-import { supabaseClient } from '../db/supabase.client.ts';
+import { createServerClient } from '@supabase/ssr';
+import type { Database } from '../db/database.types.ts';
 
 // In-memory store for rate limiting: userId -> array of request timestamps
 const rateLimitStore = new Map<string, number[]>();
@@ -36,12 +36,40 @@ function checkRateLimit(userId: string, endpoint: string): boolean {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
-  context.locals.supabase = supabaseClient;
+  // Create a Supabase client per request that can handle cookies
+  const supabase = createServerClient<Database>(
+    import.meta.env.SUPABASE_URL,
+    import.meta.env.SUPABASE_KEY,
+    {
+      cookies: {
+        getAll() {
+          // Get all cookies from Astro context
+          const cookieHeader = context.request.headers.get('cookie');
+          if (!cookieHeader) return [];
+          
+          return cookieHeader.split('; ').map((cookie) => {
+            const [name, ...rest] = cookie.split('=');
+            return {
+              name,
+              value: rest.join('='),
+            };
+          });
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            context.cookies.set(name, value, options);
+          });
+        },
+      },
+    }
+  );
+
+  context.locals.supabase = supabase;
 
   // Get the session from Supabase
   const {
     data: { session },
-  } = await supabaseClient.auth.getSession();
+  } = await supabase.auth.getSession();
   context.locals.session = session;
 
   // Check rate limiting for generation endpoint
