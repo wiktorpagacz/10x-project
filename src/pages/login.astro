@@ -1,0 +1,17 @@
+---
+import AuthLayout from "@/layouts/AuthLayout.astro";
+import { LoginForm } from "@/components/auth";
+
+// TODO: Server-side session check will be implemented in backend phase
+// const user = Astro.locals.user;
+// if (user) {
+//   return Astro.redirect('/');
+// }
+---
+
+<AuthLayout
+  title="Zaloguj się - 10xCards"
+  description="Zaloguj się do swojego konta 10xCards"
+>
+  <LoginForm client:load />
+</AuthLayout>
