@@ -51,8 +51,8 @@ export async function generateFlashcardsFromText(
 ): Promise<CreateGenerationResponseDto> {
   // Using Meta Llama 3.2 3B Instruct - Free tier, fast and reliable
   // See: https://openrouter.ai/meta-llama/llama-3.2-3b-instruct:free
-  // Alternative: google/gemini-2.0-flash-exp:free (can be unstable)
-  const MODEL = 'google/gemini-2.0-flash-exp:free';
+  // Alternative: xiaomi/mimo-v2-flash:free / google/gemini-2.0-flash-exp:free (can be unstable)
+  const MODEL = 'xiaomi/mimo-v2-flash:free';
   const startTime = Date.now();
 
   try {

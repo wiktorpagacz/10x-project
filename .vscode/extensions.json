@@ -3,7 +3,9 @@
     "astro-build.astro-vscode",
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
-    "christian-kohler.path-intellisense"
+    "christian-kohler.path-intellisense",
+    "vitest.explorer",
+    "ms-playwright.playwright"
   ],
   "unwantedRecommendations": []
 }

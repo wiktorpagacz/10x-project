@@ -1,4 +1,15 @@
-Frontend - Astro z React dla komponentów interaktywnych:
+Frontend - Astro CI/CD i Hosting:
+- Github Actions do tworzenia pipeline'ów CI/CD
+- DigitalOcean do hostowania aplikacji za pośrednictwem obrazu docker
+
+Testing - Kompleksowe testowanie aplikacji:
+- Vitest - Framework do testów jednostkowych (unit tests) i integracyjnych
+- Playwright / Cypress - Automatyzacja przeglądarki dla testów end-to-end (E2E)
+- Apache JMeter / k6 - Testy wydajnościowe i obciążeniowe (load testing)
+- Lighthouse - Audyty wydajności frontendu i dostępności
+- OWASP ZAP - Automatyczne skanowanie podatności bezpieczeństwa
+- axe DevTools - Testy dostępności (accessibility) zgodnie z WCAG 2.1 Level AA
+- NVDA/JAWS - Testy ze screen readeramieact dla komponentów interaktywnych:
 - Astro 5 pozwala na tworzenie szybkich, wydajnych stron i aplikacji z minimalną ilością JavaScript
 - React 19 zapewni interaktywność tam, gdzie jest potrzebna
 - TypeScript 5 dla statycznego typowania kodu i lepszego wsparcia IDE
