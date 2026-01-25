@@ -39,6 +39,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-001
 - Tytuł: Rejestracja nowego użytkownika
+- **Wymaga zalogowania:** NIE
 - Opis: Jako nowy użytkownik, chcę móc założyć konto w aplikacji przy użyciu e-maila i hasła, aby móc zapisywać swoje fiszki.
 - Kryteria akceptacji:
   - 1. Formularz rejestracji zawiera pola na e-mail i hasło (z powtórzeniem).
@@ -49,6 +50,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-002
 - Tytuł: Logowanie do aplikacji
+- **Wymaga zalogowania:** NIE
 - Opis: Jako zarejestrowany użytkownik, chcę móc zalogować się na swoje konto, aby uzyskać dostęp do moich fiszek.
 - Kryteria akceptacji:
   - 1. Formularz logowania zawiera pola na login i hasło.
@@ -59,6 +61,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-003
 - Tytuł: Zmiana hasła
+- **Wymaga zalogowania:** TAK
 - Opis: Jako zalogowany użytkownik, chcę mieć możliwość zmiany swojego hasła, aby zabezpieczyć swoje konto.
 - Kryteria akceptacji:
   - 1. W ustawieniach konta znajduje się opcja zmiany hasła.
@@ -70,6 +73,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-004
 - Tytuł: Generowanie fiszek z tekstu
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę wkleić tekst do aplikacji i zainicjować proces generowania fiszek, aby zaoszczędzić czas.
 - Kryteria akceptacji:
   - 1. Na stronie głównej znajduje się pole tekstowe (textarea) i przycisk "Generuj fiszki".
@@ -81,6 +85,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-005
 - Tytuł: Recenzja wygenerowanych fiszek
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę przejrzeć listę fiszek wygenerowanych przez AI, aby zdecydować, które z nich zapisać w mojej kolekcji.
 - Kryteria akceptacji:
   - 1. Po wygenerowaniu widzę listę proponowanych fiszek (przód i tył) pod formularzem generowania.
@@ -94,6 +99,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-006
 - Tytuł: Ręczne tworzenie fiszki
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę móc ręcznie dodać pojedynczą fiszkę, gdy mam konkretne pojęcie do zapamiętania.
 - Kryteria akceptacji:
   - 1. Na stronie z listą fiszek znajduje się przycisk "Dodaj fiszkę".
@@ -104,6 +110,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-007
 - Tytuł: Przeglądanie listy fiszek
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę widzieć listę wszystkich moich zapisanych fiszek, abym mógł je przeglądać i zarządzać nimi.
 - Kryteria akceptacji:
   - 1. Domyślny widok po zalogowaniu to okno generowania fiszek.
@@ -113,6 +120,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-008
 - Tytuł: "Pusty stan" dla nowych użytkowników
+- **Wymaga zalogowania:** TAK
 - Opis: Jako nowy użytkownik, który nie ma jeszcze żadnych fiszek, chcę zobaczyć zachętę do podjęcia pierwszej akcji.
 - Kryteria akceptacji:
   - 1. Gdy lista fiszek jest pusta, przycisk "Moje fiszki" jest niedostępny.
@@ -121,6 +129,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-009
 - Tytuł: Wyszukiwanie fiszek
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę móc szybko znaleźć konkretną fiszkę w mojej kolekcji.
 - Kryteria akceptacji:
   - 1. Nad listą fiszek znajduje się pole wyszukiwania.
@@ -131,6 +140,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-010
 - Tytuł: Edycja istniejącej fiszki
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę móc edytować treść istniejącej fiszki, aby poprawić błędy lub zaktualizować informacje.
 - Kryteria akceptacji:
   - 1. Kliknięcie przycisku "Edytuj" przy fiszce na liście otwiera to samo okno modalne, co przy tworzeniu ręcznym.
@@ -140,6 +150,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-011
 - Tytuł: Usuwanie fiszki
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę móc usunąć fiszkę, której już nie potrzebuję.
 - Kryteria akceptacji:
   - 1. Kliknięcie przycisku "Usuń" przy fiszce wyświetla okno modalne z prośbą o potwierdzenie.
@@ -150,6 +161,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-012
 - Tytuł: Rozpoczęcie sesji powtórkowej
+- **Wymaga zalogowania:** TAK
 - Opis: Jako użytkownik, chcę móc rozpocząć sesję nauki, podczas której aplikacja będzie mi prezentować fiszki zgodnie z algorytmem spaced repetition.
 - Kryteria akceptacji:
   - 1. W interfejsie znajduje się przycisk "Rozpocznij naukę".
@@ -161,6 +173,7 @@ Manualne tworzenie wysokiej jakości fiszek edukacyjnych jest procesem czasochł
 ---
 - ID: US-013
 - Tytuł: Logowanie zdarzeń na potrzeby metryk
+- **Wymaga zalogowania:** TAK
 - Opis: Jako właściciel produktu, chcę, aby system logował kluczowe zdarzenia związane z tworzeniem fiszek, abym mógł mierzyć kryteria sukcesu.
 - Kryteria akceptacji:
   - 1. Każda sesja generowania fiszek przez AI tworzy unikalny log.
