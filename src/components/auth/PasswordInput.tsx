@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { Label } from '@/components/ui/label';
+import { useState } from "react";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface PasswordInputProps {
   id: string;
@@ -9,7 +10,7 @@ interface PasswordInputProps {
   error?: string;
   placeholder?: string;
   disabled?: boolean;
-  'data-testid'?: string;
+  "data-testid"?: string;
 }
 
 /**
@@ -21,35 +22,35 @@ export function PasswordInput({
   value,
   onChange,
   error,
-  placeholder = '••••••••',
+  placeholder = "••••••••",
   disabled = false,
-  'data-testid': dataTestId,
+  "data-testid": dataTestId,
 }: PasswordInputProps) {
   const [showPassword, setShowPassword] = useState(false);
 
   return (
     <div className="space-y-2">
-      <Label htmlFor={id} className={error ? 'text-destructive' : ''}>
+      <Label htmlFor={id} className={error ? "text-destructive" : ""}>
         {label}
         <span className="text-destructive ml-1">*</span>
       </Label>
       <div className="relative">
         <input
           id={id}
-          type={showPassword ? 'text' : 'password'}
+          type={showPassword ? "text" : "password"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
           data-testid={dataTestId}
-          className={`
-            w-full px-3 py-2 pr-10 rounded-md border bg-background
-            transition-colors
-            focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-            disabled:cursor-not-allowed disabled:opacity-50
-            ${error ? 'border-destructive' : 'border-input'}
-          `}
-          aria-invalid={error ? 'true' : 'false'}
+          className={cn(
+            "w-full px-3 py-2 pr-10 rounded-md border bg-background",
+            "transition-colors",
+            "focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            error ? "border-destructive" : "border-input"
+          )}
+          aria-invalid={error ? "true" : "false"}
           aria-describedby={error ? `${id}-error` : undefined}
         />
         <button
@@ -58,7 +59,7 @@ export function PasswordInput({
           disabled={disabled}
           data-testid={dataTestId ? `${dataTestId}-toggle` : undefined}
           className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-colors disabled:cursor-not-allowed"
-          aria-label={showPassword ? 'Ukryj hasło' : 'Pokaż hasło'}
+          aria-label={showPassword ? "Ukryj hasło" : "Pokaż hasło"}
         >
           {showPassword ? (
             <svg
@@ -94,7 +95,12 @@ export function PasswordInput({
         </button>
       </div>
       {error ? (
-        <p id={`${id}-error`} className="text-sm text-destructive" role="alert" data-testid={dataTestId ? `${dataTestId}-error` : undefined}>
+        <p
+          id={`${id}-error`}
+          className="text-sm text-destructive"
+          role="alert"
+          data-testid={dataTestId ? `${dataTestId}-error` : undefined}
+        >
           {error}
         </p>
       ) : null}

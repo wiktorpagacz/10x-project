@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { authService } from "@/lib/services/auth.service";
+import { navigationService } from "@/lib/services/navigation.service";
 
 interface LogoutButtonProps {
   className?: string;
@@ -16,22 +18,10 @@ export function LogoutButton({ className }: LogoutButtonProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("Logout error:", error);
-        alert("Wystąpił błąd podczas wylogowania. Spróbuj ponownie.");
-        return;
-      }
+      await authService.logout();
 
       // Redirect to login page after successful logout
-      window.location.href = "/login";
+      navigationService.redirectToLogin();
     } catch (error) {
       console.error("Logout error:", error);
       alert("Wystąpił błąd podczas wylogowania. Spróbuj ponownie.");
@@ -41,13 +31,7 @@ export function LogoutButton({ className }: LogoutButtonProps) {
   };
 
   return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleLogout}
-      disabled={isLoading}
-      className={className}
-    >
+    <Button variant="outline" size="sm" onClick={handleLogout} disabled={isLoading} className={className}>
       {isLoading ? "Wylogowywanie..." : "Wyloguj"}
     </Button>
   );

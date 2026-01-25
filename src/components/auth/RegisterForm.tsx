@@ -1,9 +1,11 @@
-import { useRegisterForm } from './hooks/useRegisterForm';
-import { AuthFormWrapper } from './AuthFormWrapper';
-import { PasswordInput } from './PasswordInput';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import type { AuthSuccessResponseDto, ErrorResponse } from '@/types';
+import { useRegisterForm } from "./hooks/useRegisterForm";
+import { AuthFormWrapper } from "./AuthFormWrapper";
+import { PasswordInput } from "./PasswordInput";
+import { FormInput } from "@/components/ui/form-input";
+import { Button } from "@/components/ui/button";
+import { authService } from "@/lib/services/auth.service";
+import { navigationService } from "@/lib/services/navigation.service";
+import type { ErrorResponse } from "@/types";
 
 /**
  * Registration form component with client-side validation.
@@ -34,45 +36,38 @@ export function RegisterForm() {
     resetErrors(); // Clear any previous errors
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formState.email,
-          password: formState.password,
-          confirmPassword: formState.confirmPassword,
-        }),
+      const successData = await authService.register({
+        email: formState.email,
+        password: formState.password,
+        confirmPassword: formState.confirmPassword,
       });
 
-      const data = await response.json();
+      console.log("Registration successful:", successData.user.email);
 
-      if (!response.ok) {
-        const errorData = data as ErrorResponse;
-        
+      // Auto-login and redirect to home page per US-001 criterion 3
+      navigationService.redirectToHome();
+    } catch (error) {
+      // Handle ErrorResponse from API
+      if (error && typeof error === "object" && "error" in error) {
+        const errorData = error as ErrorResponse;
+
         // Handle field-specific errors
-        if (errorData.error.field === 'email') {
-          setFieldError('email', errorData.error.message);
-        } else if (errorData.error.field === 'password') {
-          setFieldError('password', errorData.error.message);
-        } else if (errorData.error.field === 'confirmPassword') {
-          setFieldError('confirmPassword', errorData.error.message);
+        if (errorData.error.field === "email") {
+          setFieldError("email", errorData.error.message);
+        } else if (errorData.error.field === "password") {
+          setFieldError("password", errorData.error.message);
+        } else if (errorData.error.field === "confirmPassword") {
+          setFieldError("confirmPassword", errorData.error.message);
         } else {
           // General error (email taken, etc.)
           setGeneralError(errorData.error.message);
         }
-        
-        return;
+      } else {
+        // Handle network errors or other exceptions
+        setGeneralError("Wystąpił błąd. Spróbuj ponownie");
       }
 
-      // Success! Auto-login and redirect to home page per US-001 criterion 3
-      const successData = data as AuthSuccessResponseDto;
-      console.log('Registration successful:', successData.user.email);
-      
-      // Per Option B from Q5: React handles redirect
-      window.location.href = '/';
-    } catch (error) {
-      setGeneralError('Wystąpił błąd. Spróbuj ponownie');
-      console.error('Registration error:', error);
+      console.error("Registration error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -86,36 +81,17 @@ export function RegisterForm() {
       generalError={formState.errors.general}
     >
       {/* Email Input */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="email"
-          className={formState.errors.email ? 'text-destructive' : ''}
-        >
-          Email <span className="text-destructive">*</span>
-        </Label>
-        <input
-          id="email"
-          type="email"
-          value={formState.email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="twoj@email.com"
-          disabled={formState.isLoading}
-          className={`
-            w-full px-3 py-2 rounded-md border bg-background
-            transition-colors
-            focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-            disabled:cursor-not-allowed disabled:opacity-50
-            ${formState.errors.email ? 'border-destructive' : 'border-input'}
-          `}
-          aria-invalid={formState.errors.email ? 'true' : 'false'}
-          aria-describedby={formState.errors.email ? 'email-error' : undefined}
-        />
-        {formState.errors.email && (
-          <p id="email-error" className="text-sm text-destructive" role="alert">
-            {formState.errors.email}
-          </p>
-        )}
-      </div>
+      <FormInput
+        id="email"
+        label="Email"
+        type="email"
+        value={formState.email}
+        onChange={setEmail}
+        error={formState.errors.email}
+        placeholder="twoj@email.com"
+        disabled={formState.isLoading}
+        required
+      />
 
       {/* Password Input */}
       <PasswordInput
@@ -138,21 +114,14 @@ export function RegisterForm() {
       />
 
       {/* Submit Button */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={formState.isLoading}
-      >
-        {formState.isLoading ? 'Tworzenie konta...' : 'Zarejestruj się'}
+      <Button type="submit" className="w-full" disabled={formState.isLoading}>
+        {formState.isLoading ? "Tworzenie konta..." : "Zarejestruj się"}
       </Button>
 
       {/* Link to Login */}
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Masz już konto? </span>
-        <a
-          href="/login"
-          className="text-primary hover:underline font-medium"
-        >
+        <a href="/login" className="text-primary hover:underline font-medium">
           Zaloguj się
         </a>
       </div>

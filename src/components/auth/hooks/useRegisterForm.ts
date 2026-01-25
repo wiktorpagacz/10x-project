@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState } from "react";
+import { registerSchema } from "@/lib/validation/auth-schemas";
+import type { ZodError } from "zod";
 
 interface RegisterFormState {
   email: string;
@@ -20,99 +22,94 @@ interface UseRegisterFormReturn {
   setConfirmPassword: (password: string) => void;
   validateForm: () => boolean;
   setGeneralError: (error: string) => void;
-  setFieldError: (field: 'email' | 'password' | 'confirmPassword', error: string) => void;
+  setFieldError: (field: "email" | "password" | "confirmPassword", error: string) => void;
   setIsLoading: (loading: boolean) => void;
   resetErrors: () => void;
 }
 
 /**
  * Custom hook for managing registration form state and validation.
+ * Uses Zod schema for validation as per project guidelines.
  */
 export function useRegisterForm(): UseRegisterFormReturn {
   const [formState, setFormState] = useState<RegisterFormState>({
-    email: '',
-    password: '',
-    confirmPassword: '',
+    email: "",
+    password: "",
+    confirmPassword: "",
     isLoading: false,
     errors: {},
   });
 
-  const setEmail = useCallback((email: string) => {
+  const setEmail = (email: string) => {
     setFormState((prev) => ({
       ...prev,
       email,
       errors: { ...prev.errors, email: undefined, general: undefined },
     }));
-  }, []);
+  };
 
-  const setPassword = useCallback((password: string) => {
+  const setPassword = (password: string) => {
     setFormState((prev) => ({
       ...prev,
       password,
       errors: { ...prev.errors, password: undefined, general: undefined },
     }));
-  }, []);
+  };
 
-  const setConfirmPassword = useCallback((confirmPassword: string) => {
+  const setConfirmPassword = (confirmPassword: string) => {
     setFormState((prev) => ({
       ...prev,
       confirmPassword,
       errors: { ...prev.errors, confirmPassword: undefined, general: undefined },
     }));
-  }, []);
+  };
 
-  const validateForm = useCallback((): boolean => {
-    const errors: RegisterFormState['errors'] = {};
+  const validateForm = (): boolean => {
+    try {
+      registerSchema.parse({
+        email: formState.email,
+        password: formState.password,
+        confirmPassword: formState.confirmPassword,
+      });
 
-    // Email validation
-    if (!formState.email) {
-      errors.email = 'Email jest wymagany';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email)) {
-      errors.email = 'Wprowadź poprawny adres email';
+      // Clear errors if validation passes
+      setFormState((prev) => ({ ...prev, errors: {} }));
+      return true;
+    } catch (error) {
+      const zodError = error as ZodError;
+      const errors: RegisterFormState["errors"] = {};
+
+      zodError.errors.forEach((err) => {
+        const field = err.path[0] as "email" | "password" | "confirmPassword";
+        errors[field] = err.message;
+      });
+
+      setFormState((prev) => ({ ...prev, errors }));
+      return false;
     }
+  };
 
-    // Password validation
-    if (!formState.password) {
-      errors.password = 'Hasło jest wymagane';
-    } else if (formState.password.length < 8) {
-      errors.password = 'Hasło musi mieć co najmniej 8 znaków';
-    }
-
-    // Confirm password validation
-    if (!formState.confirmPassword) {
-      errors.confirmPassword = 'Potwierdź swoje hasło';
-    } else if (formState.password !== formState.confirmPassword) {
-      errors.confirmPassword = 'Hasła nie są zgodne';
-    }
-
-    setFormState((prev) => ({ ...prev, errors }));
-    return Object.keys(errors).length === 0;
-  }, [formState.email, formState.password, formState.confirmPassword]);
-
-  const setGeneralError = useCallback((error: string) => {
+  const setGeneralError = (error: string) => {
     setFormState((prev) => ({
       ...prev,
       errors: { ...prev.errors, general: error },
     }));
-  }, []);
+  };
 
-  const setFieldError = useCallback(
-    (field: 'email' | 'password' | 'confirmPassword', error: string) => {
-      setFormState((prev) => ({
-        ...prev,
-        errors: { ...prev.errors, [field]: error },
-      }));
-    },
-    [],
-  );
+  const setFieldError = (field: "email" | "password" | "confirmPassword", error: string) => {
+    setFormState((prev) => ({
+      ...prev,
+      errors: { ...prev.errors, [field]: error },
+    }));
+  };
 
-  const setIsLoading = useCallback((loading: boolean) => {
+  const setIsLoading = (loading: boolean) => {
     setFormState((prev) => ({ ...prev, isLoading: loading }));
-  }, []);
+  };
 
-  const resetErrors = useCallback(() => {
+  const resetErrors = () => {
     setFormState((prev) => ({ ...prev, errors: {} }));
-  }, []);
+  };
 
   return {
     formState,

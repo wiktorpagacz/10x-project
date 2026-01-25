@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState } from "react";
+import { loginSchema } from "@/lib/validation/auth-schemas";
+import type { ZodError } from "zod";
 
 interface LoginFormState {
   email: string;
@@ -17,84 +19,84 @@ interface UseLoginFormReturn {
   setPassword: (password: string) => void;
   validateForm: () => boolean;
   setGeneralError: (error: string) => void;
-  setFieldError: (field: 'email' | 'password', error: string) => void;
+  setFieldError: (field: "email" | "password", error: string) => void;
   setIsLoading: (loading: boolean) => void;
   resetErrors: () => void;
 }
 
 /**
  * Custom hook for managing login form state and validation.
+ * Uses Zod schema for validation as per project guidelines.
  */
 export function useLoginForm(): UseLoginFormReturn {
   const [formState, setFormState] = useState<LoginFormState>({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
     isLoading: false,
     errors: {},
   });
 
-  const setEmail = useCallback((email: string) => {
+  const setEmail = (email: string) => {
     setFormState((prev) => ({
       ...prev,
       email,
       errors: { ...prev.errors, email: undefined, general: undefined },
     }));
-  }, []);
+  };
 
-  const setPassword = useCallback((password: string) => {
+  const setPassword = (password: string) => {
     setFormState((prev) => ({
       ...prev,
       password,
       errors: { ...prev.errors, password: undefined, general: undefined },
     }));
-  }, []);
+  };
 
-  const validateForm = useCallback((): boolean => {
-    const errors: LoginFormState['errors'] = {};
-    
-    // Get current state synchronously
-    const currentEmail = formState.email;
-    const currentPassword = formState.password;
+  const validateForm = (): boolean => {
+    try {
+      loginSchema.parse({
+        email: formState.email,
+        password: formState.password,
+      });
 
-    // Email validation
-    if (!currentEmail) {
-      errors.email = 'Email jest wymagany';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(currentEmail)) {
-      errors.email = 'Wprowadź poprawny adres email';
+      // Clear errors if validation passes
+      setFormState((prev) => ({ ...prev, errors: {} }));
+      return true;
+    } catch (error) {
+      const zodError = error as ZodError;
+      const errors: LoginFormState["errors"] = {};
+
+      zodError.errors.forEach((err) => {
+        const field = err.path[0] as "email" | "password";
+        errors[field] = err.message;
+      });
+
+      setFormState((prev) => ({ ...prev, errors }));
+      return false;
     }
+  };
 
-    // Password validation
-    if (!currentPassword) {
-      errors.password = 'Hasło jest wymagane';
-    }
-
-    // Update state with errors
-    setFormState((prev) => ({ ...prev, errors }));
-    
-    return Object.keys(errors).length === 0;
-  }, [formState.email, formState.password]);
-
-  const setGeneralError = useCallback((error: string) => {
+  const setGeneralError = (error: string) => {
     setFormState((prev) => ({
       ...prev,
       errors: { ...prev.errors, general: error },
     }));
-  }, []);
+  };
 
-  const setFieldError = useCallback((field: 'email' | 'password', error: string) => {
+  const setFieldError = (field: "email" | "password", error: string) => {
     setFormState((prev) => ({
       ...prev,
       errors: { ...prev.errors, [field]: error },
     }));
-  }, []);
+  };
 
-  const setIsLoading = useCallback((loading: boolean) => {
+  const setIsLoading = (loading: boolean) => {
     setFormState((prev) => ({ ...prev, isLoading: loading }));
-  }, []);
+  };
 
-  const resetErrors = useCallback(() => {
+  const resetErrors = () => {
     setFormState((prev) => ({ ...prev, errors: {} }));
-  }, []);
+  };
 
   return {
     formState,

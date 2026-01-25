@@ -1,25 +1,19 @@
-import { useLoginForm } from './hooks/useLoginForm';
-import { AuthFormWrapper } from './AuthFormWrapper';
-import { PasswordInput } from './PasswordInput';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import type { AuthSuccessResponseDto, ErrorResponse } from '@/types';
+import { useLoginForm } from "./hooks/useLoginForm";
+import { AuthFormWrapper } from "./AuthFormWrapper";
+import { PasswordInput } from "./PasswordInput";
+import { FormInput } from "@/components/ui/form-input";
+import { Button } from "@/components/ui/button";
+import { authService } from "@/lib/services/auth.service";
+import { navigationService } from "@/lib/services/navigation.service";
+import type { ErrorResponse } from "@/types";
 
 /**
  * Login form component with client-side validation.
  * Handles user authentication through email and password.
  */
 export function LoginForm() {
-  const {
-    formState,
-    setEmail,
-    setPassword,
-    validateForm,
-    setGeneralError,
-    setFieldError,
-    setIsLoading,
-    resetErrors,
-  } = useLoginForm();
+  const { formState, setEmail, setPassword, validateForm, setGeneralError, setFieldError, setIsLoading, resetErrors } =
+    useLoginForm();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,42 +27,35 @@ export function LoginForm() {
     resetErrors(); // Clear any previous errors
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formState.email,
-          password: formState.password,
-        }),
+      const successData = await authService.login({
+        email: formState.email,
+        password: formState.password,
       });
 
-      const data = await response.json();
+      console.log("Login successful:", successData.user.email);
 
-      if (!response.ok) {
-        const errorData = data as ErrorResponse;
-        
+      // Per Option B from Q5: React handles redirect
+      navigationService.redirectToHome();
+    } catch (error) {
+      // Handle ErrorResponse from API
+      if (error && typeof error === "object" && "error" in error) {
+        const errorData = error as ErrorResponse;
+
         // Handle field-specific errors
-        if (errorData.error.field === 'email') {
-          setFieldError('email', errorData.error.message);
-        } else if (errorData.error.field === 'password') {
-          setFieldError('password', errorData.error.message);
+        if (errorData.error.field === "email") {
+          setFieldError("email", errorData.error.message);
+        } else if (errorData.error.field === "password") {
+          setFieldError("password", errorData.error.message);
         } else {
           // General error (invalid credentials, etc.)
           setGeneralError(errorData.error.message);
         }
-        
-        return;
+      } else {
+        // Handle network errors or other exceptions
+        setGeneralError("Wystąpił błąd. Spróbuj ponownie");
       }
 
-      // Success! Redirect to home page (generation view per US-007)
-      const successData = data as AuthSuccessResponseDto;
-      console.log('Login successful:', successData.user.email);
-      
-      // Per Option B from Q5: React handles redirect
-      window.location.href = '/';
-    } catch (error) {
-      setGeneralError('Wystąpił błąd. Spróbuj ponownie');
-      console.error('Login error:', error);
+      console.error("Login error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -82,37 +69,19 @@ export function LoginForm() {
       generalError={formState.errors.general}
     >
       {/* Email Input */}
-      <div className="space-y-2">
-        <Label
-          htmlFor="email"
-          className={formState.errors.email ? 'text-destructive' : ''}
-        >
-          Email <span className="text-destructive">*</span>
-        </Label>
-        <input
-          id="email"
-          type="email"
-          value={formState.email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="twoj@email.com"
-          disabled={formState.isLoading}
-          data-testid="login-email-input"
-          className={`
-            w-full px-3 py-2 rounded-md border bg-background
-            transition-colors
-            focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2
-            disabled:cursor-not-allowed disabled:opacity-50
-            ${formState.errors.email ? 'border-destructive' : 'border-input'}
-          `}
-          aria-invalid={formState.errors.email ? 'true' : 'false'}
-          aria-describedby={formState.errors.email ? 'email-error' : undefined}
-        />
-        {formState.errors.email ? (
-          <p id="email-error" className="text-sm text-destructive" role="alert" data-testid="login-email-error">
-            {formState.errors.email}
-          </p>
-        ) : null}
-      </div>
+      <FormInput
+        id="email"
+        label="Email"
+        type="email"
+        value={formState.email}
+        onChange={setEmail}
+        error={formState.errors.email}
+        placeholder="twoj@email.com"
+        disabled={formState.isLoading}
+        required
+        data-testid="login-email-input"
+        data-testid-error="login-email-error"
+      />
 
       {/* Password Input */}
       <PasswordInput
@@ -126,23 +95,14 @@ export function LoginForm() {
       />
 
       {/* Submit Button */}
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={formState.isLoading}
-        data-testid="login-submit-button"
-      >
-        {formState.isLoading ? 'Logowanie...' : 'Zaloguj się'}
+      <Button type="submit" className="w-full" disabled={formState.isLoading} data-testid="login-submit-button">
+        {formState.isLoading ? "Logowanie..." : "Zaloguj się"}
       </Button>
 
       {/* Link to Registration */}
       <div className="text-center text-sm">
         <span className="text-muted-foreground">Nie masz konta? </span>
-        <a
-          href="/register"
-          className="text-primary hover:underline font-medium"
-          data-testid="login-register-link"
-        >
+        <a href="/register" className="text-primary hover:underline font-medium" data-testid="login-register-link">
           Zarejestruj się
         </a>
       </div>
